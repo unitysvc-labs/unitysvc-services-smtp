@@ -23,20 +23,6 @@
     "type": "constant"
   },
   "schema": "listing_v1",
-  "service_options": {
-    "enrollment_vars": {
-      "SMTP_HOST": "",
-      "SMTP_PASSWORD": "",
-      "SMTP_PORT": "587",
-      "SMTP_USERNAME": ""
-    },
-    "ops_testing_parameters": {
-      "SMTP_HOST": "mailpit.svcmarket.com",
-      "SMTP_PASSWORD": "",
-      "SMTP_PORT": "1025",
-      "SMTP_USERNAME": ""
-    }
-  },
   "status": "ready",
   "time_created": "2026-03-27T00:00:00Z",
   "user_access_interfaces": {

@@ -1,0 +1,83 @@
+{
+  "currency": "USD",
+  "display_name": "SMTP Relay (Multi-Enrollment)",
+  "documents": {
+    "Connectivity test": {
+      "$doc_preset": "smtp_connectivity_v2"
+    },
+    "How to use this service": {
+      "category": "getting_started",
+      "description": "Guide to setting up multiple SMTP relay enrollments",
+      "file_path": "relay-description.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    },
+    "Python code example": {
+      "$doc_preset": "smtp_code_example"
+    },
+    "Tutorial": {
+      "category": "getting_started",
+      "description": "Step-by-step tutorial: enroll, save the SMTP password as a customer secret, send your first email",
+      "file_path": "tutorial.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    }
+  },
+  "list_price": {
+    "description": "$1 per 1,000 emails (1,000 emails per dollar)",
+    "price": "0.001",
+    "type": "constant"
+  },
+  "name": "labs/smtp-relay-plus",
+  "schema": "listing_v1",
+  "service_options": {
+    "enrollment_vars": {
+      "code": "{{ enrollment_code(6) }}"
+    },
+    "ops_testing_parameters": {
+      "host": "${ customer_secrets.SMTP_HOST }",
+      "password_secret": "SMTP_PASSWORD",
+      "port": "${ customer_secrets.SMTP_PORT }",
+      "username": "${ customer_secrets.SMTP_USERNAME }"
+    }
+  },
+  "status": "ready",
+  "time_created": "2026-03-27T00:00:00Z",
+  "user_access_interfaces": {
+    "smtp_gateway": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "{{ enrollment_vars.code }}"
+      }
+    }
+  },
+  "user_parameters_schema": {
+    "properties": {
+      "host": {
+        "default": "mailpit.svcmarket.com",
+        "description": "SMTP host (default: mailpit.svcmarket.com \u2014 the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
+        "type": "string"
+      },
+      "password_secret": {
+        "default": "",
+        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Leave empty for the mailpit default (which accepts any/no auth).",
+        "type": "string"
+      },
+      "port": {
+        "default": 1025,
+        "description": "SMTP port (default: 1025 for mailpit; 587 for STARTTLS; 465 for TLS).",
+        "type": "integer"
+      },
+      "username": {
+        "default": "",
+        "description": "SMTP username (default: empty for mailpit; usually your sending address or an API username).",
+        "type": "string"
+      }
+    },
+    "required": [],
+    "type": "object"
+  }
+}

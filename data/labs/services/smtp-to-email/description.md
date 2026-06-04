@@ -2,7 +2,7 @@
 
 Inbound email arrives at the UnitySVC SMTP gateway and is forwarded to **your own HTTP endpoint** as a faithful, lossless email envelope. Useful when something you already operate (a webhook receiver, an automation runner, a custom inbox processor) needs to react to email but can only speak HTTP.
 
-This service is **free**: you supply the receiver, UnitySVC handles the SMTP-to-HTTP plumbing. For multiple receivers under one account, use the paid [`labs/smtp-to-email-plus`](../smtp-to-email-plus/).
+This service is **free**: you supply the receiver, UnitySVC handles the SMTP-to-HTTP plumbing. For multiple receivers under one account, use the paid `labs/smtp-to-email-plus` service.
 
 ## What gets POSTed to your endpoint
 
@@ -17,7 +17,7 @@ When mail arrives the gateway POSTs a single JSON body to `${ customer_secrets.H
 | `attachments[]` | `filename`, `content_type`, `size`, base64-encoded `content` |
 | `spf`, `dkim`, `dmarc` | Authentication results from the gateway |
 
-This is the **faithful** rendering — every field present in the original email is present in the POST. If you want a smaller `{title, body, type, format}` shape instead (closer to a notification envelope), use [`smtp-to-msg`](../smtp-to-msg/) instead.
+This is the **faithful** rendering — every field present in the original email is present in the POST. If you want a smaller `{title, body, type, format}` shape instead (closer to a notification envelope), use the `smtp-to-msg` service instead.
 
 ## Authentication
 

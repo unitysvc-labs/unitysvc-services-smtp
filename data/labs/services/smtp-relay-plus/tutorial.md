@@ -2,7 +2,7 @@
 
 Send email through **multiple** customer-owned SMTP servers under a single UnitySVC account. One enrollment per upstream SMTP (e.g. personal Gmail, work SendGrid, transactional SES). Pricing: **$1 per 1,000 emails** (1,000 emails per dollar).
 
-If you only need **one** SMTP upstream, use the free [`smtp-relay`](../smtp-relay/) (BYOK) service instead — this `-plus` variant exists for the multi-account case.
+If you only need **one** SMTP upstream, use the free `smtp-relay` (BYOK) service instead — this `-plus` variant exists for the multi-account case.
 
 ## Enrollment parameters
 

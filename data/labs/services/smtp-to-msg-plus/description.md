@@ -1,6 +1,6 @@
 # SMTP-to-Message Bridge (Multi-Enrollment) — `labs/smtp-to-msg-plus`
 
-Same plumbing as [`smtp-to-msg`](../smtp-to-msg/) (inbound email → strict `{title, body, type, format}` POST to an Apprise-compatible receiver), but with **per-enrollment destinations**: one account can route different mailboxes to different Apprise instances or different Apprise-compatible receivers. Pricing: **$1 per 1,000 emails** (1,000 emails per dollar).
+Same plumbing as `smtp-to-msg` (inbound email → strict `{title, body, type, format}` POST to an Apprise-compatible receiver), but with **per-enrollment destinations**: one account can route different mailboxes to different Apprise instances or different Apprise-compatible receivers. Pricing: **$1 per 1,000 emails** (1,000 emails per dollar).
 
 If you only need **one** receiver, use the free single variant.
 

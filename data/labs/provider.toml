@@ -1,6 +1,7 @@
 contact_email = "hello@unitysvc.com"
 homepage = "https://unitysvc.com"
-name = "unitysvc-labs"
+name = "labs"
+display_name = "UnitySvc Labs"
 schema = "provider_v1"
 status = "ready"
 terms_of_service = "https://unitysvc.com/terms/"

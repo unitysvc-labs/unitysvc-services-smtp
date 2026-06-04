@@ -1,0 +1,70 @@
+{
+  "currency": "USD",
+  "display_name": "SMTP-to-Email Bridge (Multi-Enrollment)",
+  "documents": {
+    "Connectivity test": {
+      "$doc_preset": "smtp_connectivity_v2"
+    },
+    "How to use this service": {
+      "category": "getting_started",
+      "description": "Guide to setting up multiple email-to-webhook bridges under one account",
+      "file_path": "description.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    },
+    "Tutorial": {
+      "category": "getting_started",
+      "description": "Step-by-step: enroll per destination, save optional secrets, send a test email",
+      "file_path": "tutorial.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    }
+  },
+  "list_price": {
+    "description": "$1 per 1,000 emails (1,000 emails per dollar)",
+    "price": "0.001",
+    "type": "constant"
+  },
+  "name": "labs/smtp-to-email-plus",
+  "schema": "listing_v1",
+  "service_options": {
+    "enrollment_vars": {
+      "code": "{{ enrollment_code(6) }}"
+    },
+    "ops_testing_parameters": {
+      "api_key_secret": "HTTP_RELAY_API_KEY",
+      "base_url": "https://echo.unitysvc.dev"
+    }
+  },
+  "status": "ready",
+  "time_created": "2026-06-04T00:00:00Z",
+  "user_access_interfaces": {
+    "smtp_gateway": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "{{ enrollment_vars.code }}"
+      }
+    }
+  },
+  "user_parameters_schema": {
+    "properties": {
+      "api_key_secret": {
+        "default": "",
+        "description": "Name of the customer secret holding the receiver's bearer token. Leave empty if the receiver doesn't need auth.",
+        "type": "string"
+      },
+      "base_url": {
+        "description": "Customer's HTTP receiver URL (e.g. https://hooks.example.com/inbound-mail)",
+        "format": "uri",
+        "type": "string"
+      }
+    },
+    "required": [
+      "base_url"
+    ],
+    "type": "object"
+  }
+}

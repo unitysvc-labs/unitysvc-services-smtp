@@ -1,0 +1,31 @@
+{
+  "capabilities": [
+    "smtp_relay"
+  ],
+  "description": "Multi-enrollment SMTP relay. Each enrollment connects to a different SMTP server. Customers supply the non-secret pieces (host, port, username) directly as enrollment parameters, and name a single customer secret holding the SMTP password (`password_secret`). This enables multiple relay configurations \u2014 e.g., personal Gmail, work SendGrid, transactional SES \u2014 under a single account, with only the actual secret material stored in the customer-secrets store.",
+  "name": "smtp-relay-plus",
+  "payout_price": {
+    "description": "No platform commission \u2014 customer uses own SMTP",
+    "percentage": "100.00",
+    "type": "revenue_share"
+  },
+  "schema": "offering_v1",
+  "service_type": "email",
+  "status": "ready",
+  "tags": [
+    "email",
+    "smtp",
+    "byok"
+  ],
+  "time_created": "2026-03-27T00:00:00Z",
+  "upstream_access_config": {
+    "Customer SMTP": {
+      "access_method": "smtp",
+      "host": "{{ params.host }}",
+      "password": "${ customer_secrets.{{ params.password_secret }} ?? }",
+      "port": "{{ params.port }}",
+      "tls": false,
+      "username": "{{ params.username }}"
+    }
+  }
+}

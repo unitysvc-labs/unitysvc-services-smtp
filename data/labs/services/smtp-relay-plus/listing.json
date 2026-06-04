@@ -37,10 +37,11 @@
       "code": "{{ enrollment_code(6) }}"
     },
     "ops_testing_parameters": {
-      "host": "${ customer_secrets.SMTP_HOST }",
-      "password_secret": "SMTP_PASSWORD",
-      "port": "${ customer_secrets.SMTP_PORT }",
-      "username": "${ customer_secrets.SMTP_USERNAME }"
+      "host": "mailpit.svcmarket.com",
+      "password_secret": "SMTP_RELAY_PASSWORD",
+      "port": 1025,
+      "tls": false,
+      "username": ""
     }
   },
   "status": "ready",
@@ -62,14 +63,19 @@
         "type": "string"
       },
       "password_secret": {
-        "default": "",
-        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Leave empty for the mailpit default (which accepts any/no auth).",
+        "default": "SMTP_RELAY_PASSWORD",
+        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Defaults to `SMTP_RELAY_PASSWORD` \u2014 the name the non-plus `smtp-relay` uses \u2014 so empty-params enrollments share the seller-seeded testing secret. Override to a per-enrollment name to bind a different key.",
         "type": "string"
       },
       "port": {
         "default": 1025,
         "description": "SMTP port (default: 1025 for mailpit; 587 for STARTTLS; 465 for TLS).",
         "type": "integer"
+      },
+      "tls": {
+        "default": false,
+        "description": "Whether to issue STARTTLS on the upstream connection (default: false for the mailpit testing sink). Set true for real SMTP providers (Gmail, SendGrid, SES).",
+        "type": "boolean"
       },
       "username": {
         "default": "",

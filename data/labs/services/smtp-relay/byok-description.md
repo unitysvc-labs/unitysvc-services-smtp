@@ -6,10 +6,11 @@ Send emails through the UnitySVC SMTP gateway using your own SMTP server credent
 
 1. **Enroll** in this service on the UnitySVC platform
 2. **Provide your SMTP credentials** as customer secrets during enrollment:
-   - `SMTP_HOST` — your SMTP server hostname (e.g., `smtp.gmail.com`, `smtp.sendgrid.net`)
-   - `SMTP_PORT` — SMTP port (typically `587` for STARTTLS, `465` for SSL)
-   - `SMTP_USERNAME` — your SMTP username or email
-   - `SMTP_PASSWORD` — your SMTP password or app-specific password
+   - `SMTP_RELAY_HOST` — your SMTP server hostname (e.g., `smtp.gmail.com`, `smtp.sendgrid.net`)
+   - `SMTP_RELAY_USERNAME` — your SMTP username or email
+   - `SMTP_RELAY_PASSWORD` — your SMTP password or app-specific password
+   - `SMTP_RELAY_PORT` — *(optional)* SMTP port. Defaults to `587` (STARTTLS). Set to `465` for SMTPS, or leave unset.
+   - `SMTP_RELAY_TLS` — *(optional)* whether to issue STARTTLS. Defaults to `true`. Set to `false` only if you're routing to a local sink that doesn't speak TLS (e.g. `mailpit`).
 
 3. **Send email** through the UnitySVC SMTP gateway using your svcpass API key
 

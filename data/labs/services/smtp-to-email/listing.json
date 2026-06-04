@@ -1,0 +1,43 @@
+{
+  "currency": "USD",
+  "display_name": "SMTP-to-Email Bridge (Bring Your Own Endpoint)",
+  "documents": {
+    "Connectivity test": {
+      "$doc_preset": "smtp_connectivity_v2"
+    },
+    "How to use this service": {
+      "category": "getting_started",
+      "description": "Guide to forwarding inbound email to your HTTP receiver as a faithful email envelope",
+      "file_path": "email-description.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    },
+    "Tutorial": {
+      "category": "getting_started",
+      "description": "Step-by-step: stand up an HTTP receiver, save the secret, send a test email",
+      "file_path": "tutorial.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    }
+  },
+  "list_price": {
+    "description": "Free \u2014 customer provides own HTTP receiver",
+    "price": "0",
+    "type": "constant"
+  },
+  "name": "smtp-to-email",
+  "schema": "listing_v1",
+  "status": "ready",
+  "time_created": "2026-06-04T00:00:00Z",
+  "user_access_interfaces": {
+    "smtp_gateway": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "smtp-to-email"
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "capabilities": [
+    "notification"
+  ],
+  "description": "SMTP-to-msg bridge. Receives email through the UnitySVC SMTP gateway and forwards it to the customer's HTTP endpoint as a strict `{title, body, type, format}` notification envelope (the Apprise-api `/notify` shape \u2014 a drop-in for any apprise-api, mailrise, or compatible receiver). The email subject becomes `title`, the body becomes `body`. The upstream URL is resolved from the customer secret `HTTP_RELAY_BASE_URL`; if the receiver requires auth, set `HTTP_RELAY_API_KEY` (forwarded as `Authorization: Bearer`).",
+  "name": "smtp-to-msg",
+  "payout_price": {
+    "description": "Free \u2014 customer provides own HTTP receiver",
+    "percentage": "100.00",
+    "type": "revenue_share"
+  },
+  "schema": "offering_v1",
+  "service_type": "notification",
+  "status": "ready",
+  "tags": [
+    "apprise",
+    "email",
+    "http",
+    "notification",
+    "smtp"
+  ],
+  "time_created": "2026-06-04T00:00:00Z",
+  "upstream_access_config": {
+    "http_relay": {
+      "access_method": "http",
+      "api_key": "${ customer_secrets.HTTP_RELAY_API_KEY ?? }",
+      "base_url": "${ customer_secrets.HTTP_RELAY_BASE_URL }",
+      "is_active": true,
+      "is_primary": true,
+      "payload_format": "apprise"
+    }
+  }
+}

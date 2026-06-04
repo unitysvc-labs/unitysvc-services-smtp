@@ -24,7 +24,7 @@
       "host": "{{ params.host }}",
       "password": "${ customer_secrets.{{ params.password_secret }} ?? }",
       "port": "{{ params.port }}",
-      "tls": false,
+      "tls": "{{ params.tls }}",
       "username": "{{ params.username }}"
     }
   }

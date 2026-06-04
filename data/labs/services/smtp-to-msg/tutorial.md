@@ -67,5 +67,5 @@ usvc_seller services run-tests smtp-to-msg --force
 
 ## When to switch
 
-- Want **attachments / full email**? Switch to [`smtp-to-email`](../smtp-to-email/).
-- Want **multiple receivers** (e.g. sales/support/ops each on a different apprise instance)? Switch to the paid [`labs/smtp-to-msg-plus`](../smtp-to-msg-plus/).
+- Want **attachments / full email**? Switch to the `smtp-to-email` service.
+- Want **multiple receivers** (e.g. sales/support/ops each on a different apprise instance)? Switch to the paid `labs/smtp-to-msg-plus` service.

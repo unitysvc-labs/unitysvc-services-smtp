@@ -8,7 +8,7 @@ Send emails through the UnitySVC SMTP gateway using your own SMTP servers. Unlik
 - **Transactional + Marketing** — separate enrollments for SES (transactional) and Mailgun (marketing).
 - **Multi-tenant** — different SMTP servers for different clients or projects.
 
-If you only need **one** upstream SMTP, use the free [`smtp-relay`](../smtp-relay/) — this `-plus` exists for the multi-account case.
+If you only need **one** upstream SMTP, use the free `smtp-relay` service — this `-plus` exists for the multi-account case.
 
 ## What goes where: parameters vs. customer secrets
 

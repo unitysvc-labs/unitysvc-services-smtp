@@ -1,6 +1,6 @@
 # SMTP-to-Email Bridge (Multi-Enrollment) — `labs/smtp-to-email-plus`
 
-Same plumbing as [`smtp-to-email`](../smtp-to-email/) (inbound email → faithful HTTP POST of the full envelope), but with **per-enrollment destination URLs**: one account can run many independent email-to-webhook routes — e.g. `sales@…` → CRM webhook, `support@…` → ticket queue, `ops@…` → on-call paging. Pricing: **$1 per 1,000 emails** (1,000 emails per dollar).
+Same plumbing as `smtp-to-email` (inbound email → faithful HTTP POST of the full envelope), but with **per-enrollment destination URLs**: one account can run many independent email-to-webhook routes — e.g. `sales@…` → CRM webhook, `support@…` → ticket queue, `ops@…` → on-call paging. Pricing: **$1 per 1,000 emails** (1,000 emails per dollar).
 
 If you only need **one** receiver, use the free single variant — this paid `-plus` exists for the multi-route case.
 

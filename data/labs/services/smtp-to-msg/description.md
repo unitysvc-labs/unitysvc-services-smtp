@@ -2,7 +2,7 @@
 
 Inbound email arrives at the UnitySVC SMTP gateway and is forwarded to **your HTTP endpoint as the strict notification envelope** `{title, body, type, format}` — the same shape `apprise-api`'s `/notify` accepts and `mailrise` emits. Drop in an existing apprise-api / mailrise compatible receiver and it just works.
 
-This is the **summary** rendering of an email — only what a notification cares about. If you need the full email (headers, attachments, dkim/spf, both bodies, etc.), use [`smtp-to-email`](../smtp-to-email/) instead. For multiple receivers under one account, use the paid [`labs/smtp-to-msg-plus`](../smtp-to-msg-plus/).
+This is the **summary** rendering of an email — only what a notification cares about. If you need the full email (headers, attachments, dkim/spf, both bodies, etc.), use the `smtp-to-email` service instead. For multiple receivers under one account, use the paid `labs/smtp-to-msg-plus` service.
 
 ## What gets POSTed to your endpoint
 

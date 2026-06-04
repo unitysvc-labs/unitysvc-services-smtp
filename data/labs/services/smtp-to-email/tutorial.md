@@ -78,7 +78,7 @@ A typical POST body:
 }
 ```
 
-Everything in the email is preserved. If you'd rather receive `{title, body, type, format}` instead (the Apprise-style notification envelope), switch to the [`smtp-to-msg`](../smtp-to-msg/) service.
+Everything in the email is preserved. If you'd rather receive `{title, body, type, format}` instead (the Apprise-style notification envelope), switch to the `smtp-to-msg` service.
 
 ## 5. Verify via the platform
 

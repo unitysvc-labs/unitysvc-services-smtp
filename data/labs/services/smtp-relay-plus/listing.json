@@ -33,8 +33,8 @@
   "name": "labs/smtp-relay-plus",
   "schema": "listing_v1",
   "service_options": {
-    "enrollment_vars": {
-      "code": "{{ enrollment_code(6) }}"
+    "enrollment": {
+      "scope": "global"
     },
     "ops_testing_parameters": {
       "host": "mailpit.svcmarket.com",
@@ -51,7 +51,7 @@
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
       "routing_key": {
-        "username": "{{ enrollment_vars.code }}"
+        "username": "{{ enrollment.code }}"
       }
     }
   },

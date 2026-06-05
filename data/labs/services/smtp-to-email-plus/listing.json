@@ -30,8 +30,8 @@
   "name": "labs/smtp-to-email-plus",
   "schema": "listing_v1",
   "service_options": {
-    "enrollment_vars": {
-      "code": "{{ enrollment_code(6) }}"
+    "enrollment": {
+      "scope": "global"
     },
     "ops_testing_parameters": {
       "api_key_secret": "HTTP_RELAY_API_KEY",
@@ -45,7 +45,7 @@
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
       "routing_key": {
-        "username": "{{ enrollment_vars.code }}"
+        "username": "{{ enrollment.code }}"
       }
     }
   },

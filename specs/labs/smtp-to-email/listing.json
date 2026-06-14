@@ -27,8 +27,7 @@
     "price": "0",
     "type": "constant"
   },
-  "name": "smtp-to-email",
-  "schema": "listing_v1",
+  "name": "labs/smtp-to-email",
   "status": "ready",
   "time_created": "2026-06-04T00:00:00Z",
   "user_access_interfaces": {

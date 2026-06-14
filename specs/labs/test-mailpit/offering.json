@@ -9,7 +9,6 @@
     "percentage": "0",
     "type": "revenue_share"
   },
-  "schema": "offering_v1",
   "service_type": "email",
   "status": "ready",
   "tags": [

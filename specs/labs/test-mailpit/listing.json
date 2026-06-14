@@ -1,14 +1,14 @@
 {
   "currency": "USD",
-  "display_name": "SMTP Relay (Bring Your Own Key)",
+  "display_name": "Test SMTP Relay (Mailpit)",
   "documents": {
     "Connectivity test": {
       "$doc_preset": "smtp_connectivity_v2"
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "Guide to configuring your own SMTP credentials for relay",
-      "file_path": "byok-description.md",
+      "description": "Guide to sending test emails through the SMTP gateway",
+      "file_path": "description.md",
       "is_active": true,
       "is_public": true,
       "mime_type": "markdown"
@@ -18,19 +18,19 @@
     }
   },
   "list_price": {
-    "description": "Free \u2014 customer provides own SMTP server",
+    "description": "Free \u2014 test service",
     "price": "0",
     "type": "constant"
   },
-  "schema": "listing_v1",
-  "status": "ready",
+  "name": "labs/test-mailpit",
+  "status": "deprecated",
   "time_created": "2026-03-27T00:00:00Z",
   "user_access_interfaces": {
     "smtp_gateway": {
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
       "routing_key": {
-        "username": "smtp-byok"
+        "username": "test-mailpit"
       }
     }
   }

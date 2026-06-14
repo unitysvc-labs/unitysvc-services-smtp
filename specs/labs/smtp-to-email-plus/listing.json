@@ -1,13 +1,13 @@
 {
   "currency": "USD",
-  "display_name": "SMTP-to-Message Bridge (Multi-Enrollment)",
+  "display_name": "SMTP-to-Email Bridge (Multi-Enrollment)",
   "documents": {
     "Connectivity test": {
       "$doc_preset": "smtp_connectivity_v2"
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "Guide to running multiple email-to-Apprise routes under one account",
+      "description": "Guide to setting up multiple email-to-webhook bridges under one account",
       "file_path": "description.md",
       "is_active": true,
       "is_public": true,
@@ -27,8 +27,7 @@
     "price": "0.001",
     "type": "constant"
   },
-  "name": "labs/smtp-to-msg-plus",
-  "schema": "listing_v1",
+  "name": "labs/smtp-to-email-plus",
   "service_options": {
     "enrollment": {
       "scope": "global"
@@ -57,7 +56,7 @@
         "type": "string"
       },
       "base_url": {
-        "description": "Customer's Apprise-compatible HTTP receiver URL (e.g. https://apprise.unitysvc.dev/notify/<key>)",
+        "description": "Customer's HTTP receiver URL (e.g. https://hooks.example.com/inbound-mail)",
         "format": "uri",
         "type": "string"
       }

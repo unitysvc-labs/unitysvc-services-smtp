@@ -11,3 +11,5 @@ jobs:
   upload:
     uses: unitysvc-labs/.github/.github/workflows/seller-upload-production.yml@main
     secrets: inherit
+    permissions:
+      contents: write

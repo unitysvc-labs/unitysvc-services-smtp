@@ -31,7 +31,6 @@
     "type": "constant"
   },
   "name": "labs/smtp-relay-plus",
-  "schema": "listing_v1",
   "service_options": {
     "enrollment": {
       "scope": "global"

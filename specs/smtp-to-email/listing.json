@@ -1,13 +1,13 @@
 {
   "currency": "USD",
-  "display_name": "SMTP-to-Message Bridge (Apprise envelope)",
+  "display_name": "SMTP-to-Email Bridge (Bring Your Own Endpoint)",
   "documents": {
     "Connectivity test": {
       "$doc_preset": "smtp_connectivity_v2"
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "Guide to forwarding inbound email as an Apprise-style notification to your HTTP receiver",
+      "description": "Guide to forwarding inbound email to your HTTP receiver as a faithful email envelope",
       "file_path": "description.md",
       "is_active": true,
       "is_public": true,
@@ -15,7 +15,7 @@
     },
     "Tutorial": {
       "category": "getting_started",
-      "description": "Step-by-step: stand up an Apprise-compatible receiver, save the secret, send a test email",
+      "description": "Step-by-step: stand up an HTTP receiver, save the secret, send a test email",
       "file_path": "tutorial.md",
       "is_active": true,
       "is_public": true,
@@ -27,7 +27,7 @@
     "price": "0",
     "type": "constant"
   },
-  "name": "labs/smtp-to-msg",
+  "name": "smtp-to-email",
   "status": "ready",
   "time_created": "2026-06-04T00:00:00Z",
   "user_access_interfaces": {
@@ -35,7 +35,7 @@
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
       "routing_key": {
-        "username": "smtp-to-msg"
+        "username": "smtp-to-email"
       }
     }
   }

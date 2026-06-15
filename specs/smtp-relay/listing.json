@@ -22,7 +22,7 @@
     "price": "0",
     "type": "constant"
   },
-  "name": "labs/smtp-relay",
+  "name": "smtp-relay",
   "status": "ready",
   "time_created": "2026-03-27T00:00:00Z",
   "user_access_interfaces": {

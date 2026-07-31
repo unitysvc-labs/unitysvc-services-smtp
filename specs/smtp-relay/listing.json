@@ -7,7 +7,7 @@
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "Guide to configuring your own SMTP credentials for relay",
+      "description": "How SMTP Relay works and the two ways to use it \u2014 a stored SMTP server (free) or per-enrollment SMTP servers (metered)",
       "file_path": "byok-description.md",
       "is_active": true,
       "is_public": true,
@@ -18,14 +18,41 @@
     }
   },
   "list_price": {
-    "description": "Free \u2014 customer provides own SMTP server",
-    "price": "0",
-    "type": "constant"
+    "channels": {
+      "byok": {
+        "description": "Free \u2014 customer provides own SMTP server",
+        "price": "0",
+        "type": "constant"
+      },
+      "plus": {
+        "description": "$1 per 1,000 emails (1,000 emails per dollar)",
+        "price": "0.001",
+        "type": "constant"
+      }
+    },
+    "default": "byok",
+    "type": "channel"
   },
   "name": "smtp-relay",
+  "service_options": {
+    "ops_testing_parameters": {
+      "host": "mailpit.svcmarket.com",
+      "password_secret": "SMTP_RELAY_PASSWORD",
+      "port": 1025,
+      "tls": false,
+      "username": ""
+    }
+  },
   "status": "ready",
   "time_created": "2026-03-27T00:00:00Z",
   "user_access_interfaces": {
+    "enrollment": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "{{ enrollment.code }}"
+      }
+    },
     "smtp_gateway": {
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
@@ -33,5 +60,36 @@
         "username": "smtp-byok"
       }
     }
+  },
+  "user_parameters_schema": {
+    "properties": {
+      "host": {
+        "default": "mailpit.svcmarket.com",
+        "description": "SMTP host (default: mailpit.svcmarket.com \u2014 the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
+        "type": "string"
+      },
+      "password_secret": {
+        "default": "SMTP_RELAY_PASSWORD",
+        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Defaults to `SMTP_RELAY_PASSWORD` \u2014 the name the free `byok` channel uses \u2014 so empty-params enrollments share the seller-seeded testing secret. Override to a per-enrollment name to bind a different key.",
+        "type": "string"
+      },
+      "port": {
+        "default": 1025,
+        "description": "SMTP port (default: 1025 for mailpit; 587 for STARTTLS; 465 for TLS).",
+        "type": "integer"
+      },
+      "tls": {
+        "default": false,
+        "description": "Whether to issue STARTTLS on the upstream connection (default: false for the mailpit testing sink). Set true for real SMTP providers (Gmail, SendGrid, SES).",
+        "type": "boolean"
+      },
+      "username": {
+        "default": "",
+        "description": "SMTP username (default: empty for mailpit; usually your sending address or an API username).",
+        "type": "string"
+      }
+    },
+    "required": [],
+    "type": "object"
   }
 }

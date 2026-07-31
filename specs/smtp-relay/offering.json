@@ -2,7 +2,7 @@
   "capabilities": [
     "smtp_relay"
   ],
-  "description": "Bring Your Own Key SMTP relay. Connect your own SMTP server (Gmail, SendGrid, Mailgun, SES, etc.) and send emails through the UnitySVC gateway. Customers provide their own SMTP credentials.",
+  "description": "Bring Your Own Key SMTP relay. Connect your own SMTP server (Gmail, SendGrid, Mailgun, SES, etc.) and send email through the UnitySVC gateway; you bring the credentials, UnitySVC handles auth, routing, and metering. This is a multi-channel service: the free `byok` channel relays every call to one SMTP server you store once as customer secrets, while the metered `plus` channel lets you run many relays under a single account \u2014 each enrollment binds its own host/port/username plus a named password secret and is reached at a unique `/e/<code>` address. See \u201cHow to use this service\u201d for both channels.",
   "name": "smtp-relay",
   "payout_price": {
     "description": "No platform commission \u2014 customer uses own SMTP",
@@ -12,19 +12,28 @@
   "service_type": "email",
   "status": "ready",
   "tags": [
+    "byok",
     "email",
-    "smtp",
-    "byok"
+    "enrollment",
+    "smtp"
   ],
   "time_created": "2026-03-27T00:00:00Z",
   "upstream_access_config": {
-    "customer_smtp": {
+    "byok": {
       "access_method": "smtp",
       "host": "${ customer_secrets.SMTP_RELAY_HOST }",
       "password": "${ customer_secrets.SMTP_RELAY_PASSWORD }",
       "port": "${ customer_secrets.SMTP_RELAY_PORT ?? 587 }",
       "tls": "${ customer_secrets.SMTP_RELAY_TLS ?? true }",
       "username": "${ customer_secrets.SMTP_RELAY_USERNAME }"
+    },
+    "plus": {
+      "access_method": "smtp",
+      "host": "{{ params.host }}",
+      "password": "${ customer_secrets.{{ params.password_secret }} ?? }",
+      "port": "{{ params.port }}",
+      "tls": "{{ params.tls }}",
+      "username": "{{ params.username }}"
     }
   }
 }

@@ -99,6 +99,23 @@ real value). Seed them from the repo-committed manifest, never GitHub variables:
 - Testing does NOT require the service to be public/active. `set-visibility` +
   `submit` is **publishing** — a separate explicit step, not part of testing.
 
+### Persistent `pending` for on-wire testing without the CLI runner
+
+`services run-tests` flips the service to `pending` only for the duration of the
+run. To test a service **directly with your own scripts** (curl, the rendered
+code examples, a REST client) against the gateway, make `pending` persistent
+first, then revert when done:
+
+    usvc_seller services enable-testing <name>   # draft|rejected|suspended → pending (routable)
+    # ... run your own scripts against the gateway ...
+    usvc_seller services withdraw <name>         # pending|rejected → draft (revert)
+
+`enable-testing` is a **pure status change** — it does NOT run the activation
+pipeline, does NOT progress the service to `active`, and is NOT a submission for
+review (use `submit` for that). It just makes the service routable so on-wire
+tests resolve. Same `NAME` / `--id` / `--local-ids` / `--all` selectors as the
+other `services` commands.
+
 ## Testing gotchas (these have bitten us repeatedly)
 
 - **Draft status is NOT a cause of test failures.** `run-tests` temporarily

@@ -1,3 +1,7 @@
 {
-  "service_id": "de667eb1-1353-4576-9261-e0fc81c9e457"
+  "display_name": "SMTP-to-Email Bridge (Bring Your Own Endpoint)",
+  "name": "smtp-to-email",
+  "service_id": "de667eb1-1353-4576-9261-e0fc81c9e457",
+  "status": "updated",
+  "time_created": "2026-08-09T02:00:54.629201Z"
 }

@@ -1,36 +1,145 @@
 # CLAUDE.md — unitysvc-services-smtp
 
-Guidance for working on this seller-services repo. See also the
-`writing-unitysvc-services` skill for the full authoring/verification workflow.
+This repository holds **UnitySVC service data** — declarative `offering.json` +
+`listing.json` files (plus tests) that define services published to the UnitySVC
+gateway/marketplace. It is *data*, not application code; there is no server here.
+The authoritative, always-current workflow is the `writing-unitysvc-services`
+skill — this file is the quick, repo-local reference.
 
-## Testing services — read before diagnosing a `run-tests` failure
+## What a service is
 
-- **Draft status is NOT a cause of test failures.** When you run
-  `usvc_seller services run-tests` (or `specs run-tests`), the platform
-  **temporarily flips the service to `pending`** for the duration of the test so
-  the gateway will route to it. A service sitting in `draft` (or `rejected`) on
-  the staging listing is expected and fine while testing. Do **not** chase
-  service status when a `run-tests` send fails — it has repeatedly sent us down
-  the wrong path.
-- A gateway send-path **550 "No active enrollment found"** for an
-  enrollment-required SMTP service is about **enrollment → AccessInterface
-  routing** (the enrollment-scoped AI / bridge and the rendered
-  `routing_key.username`), not the service status.
-- The backend enrollment-access logic is verified correct against clean data
-  (see the backend repro `test_smtp_enrollment_provisioning_repro.py`): the ops
-  enrollment is a **shared** enrollment (`customer_id = OPS_CUSTOMER_ID`,
-  `owner_id = NULL`) and resolves owner-agnostically. So a staging 550 that a
-  clean re-provision doesn't fix is a **staging data condition** (stale /
-  conflicting AccessInterface rows), not a code defect.
+- **offering** (`offering.json`, exactly one) — technical spec:
+  `upstream_access_config` (upstream URL, auth, channels), `service_type`,
+  `capabilities`, `payout_price`.
+- **listing** (`listing.json`, one or more) — customer-facing: gateway
+  `user_access_interfaces` (base_url), `list_price`, `documents` (connectivity
+  test + code examples), `user_parameters_schema`.
+- **provider.json** — the provider record (accompanies each service folder).
+- **service.json** — identity sidecar `{ "service_id": "…" }` (see below).
 
-## Pipeline order (all four must be green)
+The backend derives service identity: `service.name ← listing.name`,
+`display_name ← listing/offering display_name`, `status ← worst-of component
+statuses.
 
-`specs validate` → `specs format` → `specs run-tests <name>` (upstream) →
-`specs upload <name>` → `services run-tests <name> --force` (gateway).
+## Environment (required for anything touching staging)
 
-- The upstream-side connectivity test needs the SMTP host in the environment; an
-  `expected '220' greeting from :587` / **empty-host** failure run locally is an
-  env gap (missing `SMTP_GATEWAY_HOST`), not a service defect.
-- `service.json` sidecars: commit the **minimal** `{ "service_id": "…" }` form.
-  `run-tests`/`upload` may write back a richer sidecar (name/status/…) — that is
-  transient tool output; revert it before committing.
+`specs upload`, `services list/show/run-tests`, and any staging curl need the
+seller key in the environment — source it first:
+
+    source ~/.zshrc     # UNITYSVC_SELLER_API_KEY, UNITYSVC_SELLER_API_URL, UNITYSVC_API_KEY
+
+Invoke the CLI as `usvc_seller …` if on PATH, else
+`uvx --from unitysvc-sellers usvc_seller …`, else from a local checkout
+`uv run --project ~/unitysvc/unitysvc-sellers usvc_seller …`. A 401 or
+"Missing svcpass API key" means you forgot to source.
+
+## File layout
+
+Concrete service (hand-authored):
+
+    specs/<provider>/<service-name>/
+      ├── offering.json      # exactly one
+      ├── listing.json       # one or more (variants: listing-<x>.json, name "<p>/<s>@<variant>")
+      ├── provider.json
+      ├── service.json       # { "service_id": "…" } — commit it, minimal form
+      └── <docs>             # connectivity.*.j2, description.md, code-example.*.j2
+
+Param-file service (one template renders many — for large catalogs):
+
+    templates/<template>/{provider.json, offering.json.j2, listing.json.j2}
+    specs/<provider>/<name>.json          # { "template": "<template>", "parameters": {…} }
+    specs/<provider>/<name>.service.json  # identity sidecar
+    # Commit the param file + its .service.json — NEVER the rendered folder.
+
+The folder (or param-file stem) under `specs/<provider>/` **is** the service name.
+
+## Naming rules (the validator rejects violations)
+
+- `listing.name` MUST equal `<provider>/<service-name>` (its path under `specs/`),
+  or be a bare top-level handle. `offering.name` stays the **bare** service name.
+- If `listing.name` contains `/`, the first segment MUST equal `provider.name`.
+- `user_access_interfaces.<iface>.base_url`: use
+  `${API_GATEWAY_BASE_URL}/{{ service_name }}` (resolved from `listing.name` at
+  request time) — literal `<provider>/<service>` paths are rejected. Name the
+  single static interface `canonical`.
+- Segments ≥ 2 chars, start alphanumeric, allowed `[A-Za-z0-9._-]`, at most one
+  `@variant`. Single-letter first segments are reserved (`a b c d f g l m r t …`);
+  only `a/` is a permitted movable-pointer carve-out.
+
+## seller.secrets.txt / .env.example — the secrets manifest
+
+Every `${ customer_secrets.<NAME> }` referenced in a listing/offering needs a
+same-named **seller** secret on the platform (the gateway-side test plugs in a
+real value). Seed them from a repo-committed manifest, never GitHub variables:
+
+- Commit `seller.secrets.txt` (symlinked as `.env.example`) at the repo root:
+  `export NAME="value"` lines, each preceded by a `#` comment block that is the
+  **customer-facing** description (what the customer sets + how to get it). It is
+  both shell-sourceable for local tests and the upload workflow's seed source
+  (`usvc_seller secrets upload .env.example`).
+- Seed the **mock** value; keep the manifest exhaustive —
+  `grep -rho '\${ customer_secrets\.[A-Z_]*' specs/ | sort -u` should have no
+  name missing from it. A missing name is silently skipped ⇒ the gateway test
+  fails with no obvious cause.
+- **Namespace** secret names by service (`HTTP_RELAY_BASE_URL`,
+  `SMTP_RELAY_PASSWORD`, `<PROVIDER>_API_KEY`) — bare names collide.
+- Sensitive (key/password/token) → `customer_secrets`. Operational
+  (host/port/url/flag) → a direct `{{ params.X }}` with a default, not a secret.
+
+## Verification pipeline — all four green before "ready"
+
+    usvc_seller specs validate                     # schema + cross-file, no network
+    usvc_seller specs format                       # canonical formatting; commit result
+    usvc_seller specs run-tests <name>             # UPSTREAM-side (docs vs upstream directly)
+    usvc_seller specs upload <name>                # push to staging (re-upload ⇒ revision)
+    usvc_seller services run-tests <name> --force  # GATEWAY-side (route + svcpass + upstream)
+
+- **Selector NAME** fnmatches `listing.name`; `%` is a shell-safe synonym for `*`
+  (`cohere/%`, `%-byok`, `%command%`). Wildcards only at start/end. If a name
+  matches an active row **and** a pending revision, single-row commands need
+  `--id <prefix>`.
+- Testing does NOT require the service to be public/active. `set-visibility` +
+  `submit` is **publishing** — a separate explicit step, not part of testing.
+
+## Testing gotchas (these have bitten us repeatedly)
+
+- **Draft status is NOT a cause of test failures.** `run-tests` temporarily
+  flips the service to `pending` so the gateway routes to it. Do not chase draft
+  status — a service in `draft`/`rejected` while testing is expected and fine.
+- A gateway **550 "No active enrollment found"** is about enrollment →
+  AccessInterface routing (the enrollment-scoped AI + bridge + rendered
+  `routing_key.username`), NOT status. If a clean re-provision doesn't fix it,
+  suspect stale/conflicting staging data.
+- Tests run in **two modes**: `specs run-tests` renders docs against the upstream
+  directly (`local_testing` true branch, seller credential); `services run-tests`
+  renders the same docs against the gateway (customer svcpass key). A failure
+  only in gateway mode ⇒ wrong base_url shape (`{{ service_name }}`), wrong
+  `api_key` disposition, or not re-uploaded since the data changed.
+- An "empty host `:587`" / connectivity failure when running **locally** is
+  usually a missing env var (e.g. `SMTP_GATEWAY_HOST`), not a service defect.
+- `specs run-tests` Python `ModuleNotFoundError: requests` ⇒ wrong Python;
+  `source ~/unitysvc/.venv/bin/activate`. Environmental, not your data.
+
+## service.json sidecar
+
+- Auto-written on the first successful `specs upload`; carries the backend
+  `service_id` so later uploads target the existing service. **Commit it, in the
+  minimal form** `{ "service_id": "…" }`.
+- Don't hand-edit. Delete it only to deliberately re-upload as a brand-new
+  service. `run-tests`/`upload` may write back a richer sidecar
+  (name/status/time_created) — that is transient tool output; revert to minimal
+  before committing.
+
+## Connectivity test is mandatory
+
+Every service needs at least one connectivity-test document — a `$doc_preset`
+(`llm_connectivity`, `api_connectivity`, …) or a local `connectivity.*.j2`.
+Without it the service is untestable and cannot activate.
+
+## Authoritative docs (evolve with the platform)
+
+`~/unitysvc/unitysvc-sellers/docs/`: `file-schemas.md`, `pricing.md`,
+`naming-conventions.md`, `secrets-and-variables.md`, `service-templates.md`,
+`documenting-services.md`, `cli-reference.md`, `seller-lifecycle.md`. Closest
+working examples live in `~/unitysvc/unitysvc-services-demo/specs/unitysvc-demo/`.
+When this file conflicts with those docs, the docs win.

@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""smtp-to-msg turns an inbound email into a {title, body, type, format} JSON
+POST to your HTTP receiver — the Subject becomes `title`, the body `body`.
+
+Here the receiver is the platform sink (sink.unitysvc.dev), which records each
+request, so we CONFIRM delivery end to end: send with a unique marker in the
+subject, then long-poll the sink for a recorded request carrying it."""
+import json
+import os
+import time
+import urllib.request
+
+{% if local_testing %}
+{% else %}
+import smtplib
+from email.message import EmailMessage
+from urllib.parse import urlparse
+{% endif %}
+
+SINK = "https://sink.unitysvc.dev"  # = HTTP_RELAY_BASE_URL receiver
+marker = f"smtp2msg-{int(time.time())}-{os.getpid()}"  # unique per run
+subject = f"smtp-to-msg e2e {marker}"
+
+{% if local_testing %}
+# Upstream test: POST the envelope straight to the receiver (the sink).
+payload = {"title": subject, "body": "hello", "type": "info", "format": "text"}
+req = urllib.request.Request(
+    SINK,
+    data=json.dumps(payload).encode(),
+    method="POST",
+    headers={"Content-Type": "application/json"},
+)
+with urllib.request.urlopen(req, timeout=10) as resp:
+    assert 200 <= resp.status < 300, f"receiver returned HTTP {resp.status}"
+{% else %}
+# Gateway send: submit the email over SMTP; the gateway composes the envelope
+# (Subject -> title, body -> body) and POSTs it to the receiver.
+parsed = urlparse("{{ service_base_url }}")
+msg = EmailMessage()
+msg["From"] = "test@example.com"
+msg["To"] = "recipient@example.com"
+msg["Subject"] = subject
+msg.set_content("hello from smtp-to-msg")
+cls = smtplib.SMTP_SSL if parsed.scheme == "smtps" else smtplib.SMTP
+with cls(parsed.hostname, parsed.port or 587, timeout=10) as server:
+    if parsed.scheme != "smtps":
+        server.ehlo()
+        if server.has_extn("STARTTLS"):
+            server.starttls()
+            server.ehlo()
+    server.login("{{ routing_key.username }}", os.environ["UNITYSVC_API_KEY"])
+    server.send_message(msg)
+{% endif %}
+
+# Confirm delivery by querying the receiver: the sink long-polls up to 30s for a
+# recorded request whose body carries our marker (the transformed `title`).
+with urllib.request.urlopen(f"{SINK}/retrieve?search={marker}&wait=30", timeout=35) as resp:
+    hits = json.loads(resp.read())
+assert hits, f"NOT delivered — no request carrying {marker} reached {SINK}"
+print(f"delivered — sink recorded the transformed notification ({marker})")

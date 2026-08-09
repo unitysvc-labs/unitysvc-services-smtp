@@ -2,8 +2,8 @@
   "capabilities": [
     "notification"
   ],
-  "description": "SMTP-to-Email bridge. Receives email through the UnitySVC SMTP gateway and forwards the faithful, lossless email envelope (`from`, `to`, `subject`, `text_body`, `html_body`, headers, attachments, spf/dkim) as an HTTP POST to your own HTTP endpoint \u2014 for internal webhooks, Zapier-style automations, or any HTTP receiver. This is a multi-channel service: the free `byok` channel forwards every message to one endpoint you store once as customer secrets (`HTTP_RELAY_BASE_URL`, optional `HTTP_RELAY_API_KEY`), while the metered `plus` channel lets you run many email-to-webhook routes under a single account \u2014 each enrollment binds its own destination `base_url` and is reached at a unique `/e/<code>` address. See \u201cHow to use this service\u201d for both channels.",
-  "name": "smtp-to-email",
+  "description": "SMTP-to-HTTP bridge. Receives email through the UnitySVC SMTP gateway and forwards the faithful, lossless email envelope (`from`, `to`, `subject`, `text_body`, `html_body`, headers, attachments, spf/dkim) as an HTTP POST to your own HTTP endpoint \u2014 for internal webhooks, Zapier-style automations, or any HTTP receiver. This is a multi-channel service: the free `byok` channel forwards every message to one endpoint you store once as customer secrets (`HTTP_RELAY_BASE_URL`, optional `HTTP_RELAY_API_KEY`), while the metered `plus` channel lets you run many email-to-webhook routes under a single account \u2014 each enrollment binds its own destination `base_url` and is reached at a unique `/e/<code>` address. See \u201cHow to use this service\u201d for both channels.",
+  "name": "smtp-to-http",
   "payout_price": {
     "description": "No platform commission \u2014 customer uses own HTTP receiver",
     "percentage": "100.00",

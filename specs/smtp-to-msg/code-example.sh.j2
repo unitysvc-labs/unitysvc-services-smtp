@@ -1,0 +1,42 @@
+#!/bin/bash
+# smtp-to-msg turns an inbound email into a {title, body, type, format} JSON
+# POST to your HTTP receiver — the Subject becomes `title`, the body `body`.
+#
+# Here the receiver is the platform sink (sink.unitysvc.dev), which records each
+# request, so we can CONFIRM delivery end to end: send with a unique marker in
+# the subject, then long-poll the sink for a recorded request carrying it.
+set -euo pipefail
+
+SINK="https://sink.unitysvc.dev"                    # = HTTP_RELAY_BASE_URL receiver
+MARKER="smtp2msg-$(date +%s)-${RANDOM}"             # unique per run
+SUBJECT="smtp-to-msg e2e ${MARKER}"
+
+{% if local_testing %}
+# Upstream test: POST the envelope straight to the receiver (the sink).
+status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "${SINK}" \
+  -H 'Content-Type: application/json' \
+  --data "{\"title\":\"${SUBJECT}\",\"body\":\"hello\",\"type\":\"info\",\"format\":\"text\"}")
+[ "$status" -ge 200 ] && [ "$status" -lt 300 ] || { echo "receiver returned HTTP $status" >&2; exit 1; }
+{% else %}
+# Gateway send: submit the email over SMTP; the gateway composes the envelope
+# (Subject -> title, body -> body) and POSTs it to the receiver.
+curl --silent --show-error --ssl --url "{{ service_base_url }}" \
+  --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
+  --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
+  --upload-file - <<EMAIL
+From: test@example.com
+To: recipient@example.com
+Subject: ${SUBJECT}
+
+hello from smtp-to-msg
+EMAIL
+{% endif %}
+
+# Confirm delivery by querying the receiver: the sink long-polls up to 30s for a
+# recorded request whose body carries our marker (the transformed `title`).
+if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then
+  echo "delivered — sink recorded the transformed notification (${MARKER})"
+else
+  echo "NOT delivered — no request carrying ${MARKER} reached ${SINK}" >&2
+  exit 1
+fi

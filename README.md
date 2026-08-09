@@ -14,9 +14,9 @@ Bring-your-own-key SMTP relay — send email through your own SMTP server (Gmail
 SES, …). `byok`: one SMTP server via `SMTP_RELAY_*` secrets. `plus`: many SMTP servers, one
 per enrollment.
 
-### smtp-to-email
+### smtp-to-http
 
-SMTP-to-Email bridge — forwards inbound email to your HTTP endpoint as the faithful,
+SMTP-to-HTTP bridge — forwards inbound email to your HTTP endpoint as the faithful,
 lossless email envelope. `byok`: one receiver via `HTTP_RELAY_BASE_URL`. `plus`: many
 email-to-webhook routes, one per enrollment.
 

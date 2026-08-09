@@ -1,4 +1,4 @@
-# SMTP-to-Email Bridge — `smtp-to-email`
+# SMTP-to-HTTP Bridge — `smtp-to-http`
 
 Inbound email arrives at the UnitySVC SMTP gateway and is forwarded to **your own HTTP endpoint** as a faithful, lossless email envelope. Useful when something you already operate (a webhook receiver, an automation runner, a custom inbox processor) needs to react to email but can only speak HTTP.
 
@@ -32,7 +32,7 @@ This service exposes two **upstream access channels**. Pick whichever fits — y
 | Best for | one fixed receiver | many email-to-webhook routes under one account |
 | Destination URL | `HTTP_RELAY_BASE_URL` customer secret | a `base_url` parameter per enrollment |
 | Bearer token | `HTTP_RELAY_API_KEY` customer secret (optional) | the secret named by the `api_key_secret` parameter (optional) |
-| SMTP username | `smtp-to-email` | the enrollment's 6-character code |
+| SMTP username | `smtp-to-http` | the enrollment's 6-character code |
 | Reached at | the canonical gateway address | a unique `/e/<code>` address per enrollment |
 | Price | **free** | **$0.001 / email** ($1 per 1,000) |
 
@@ -43,7 +43,7 @@ One receiver, configured once via customer secrets.
 1. **Set your receiver** as customer secrets:
    - `HTTP_RELAY_BASE_URL` — your HTTP receiver URL (e.g. `https://hooks.example.com/inbound-mail`)
    - `HTTP_RELAY_API_KEY` — *(optional)* bearer token; omit when the receiver is public.
-2. **Send email** to the gateway with SMTP username `smtp-to-email` and your svcpass as the password. Any `To:` address works — routing is by SMTP user, not recipient.
+2. **Send email** to the gateway with SMTP username `smtp-to-http` and your svcpass as the password. Any `To:` address works — routing is by SMTP user, not recipient.
 
 A minimal Python receiver:
 
@@ -68,12 +68,12 @@ from email.message import EmailMessage
 msg = EmailMessage()
 msg["From"]    = "alice@example.com"
 msg["To"]      = "router@unitysvc.com"
-msg["Subject"] = "hello from smtp-to-email"
+msg["Subject"] = "hello from smtp-to-http"
 msg.set_content("If you can see this in your HTTP receiver, the bridge works.")
 
 with smtplib.SMTP(os.environ["SMTP_GATEWAY_HOST"], int(os.environ["SMTP_GATEWAY_PORT"])) as s:
     s.starttls()
-    s.login("smtp-to-email", os.environ["UNITYSVC_API_KEY"])
+    s.login("smtp-to-http", os.environ["UNITYSVC_API_KEY"])
     s.send_message(msg)
 ```
 

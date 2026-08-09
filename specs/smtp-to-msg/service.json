@@ -1,5 +1,5 @@
 {
-  "display_name": "SMTP-to-Message Bridge (Apprise envelope)",
+  "display_name": "SMTP-to-Message Bridge",
   "name": "smtp-to-msg",
   "service_id": "443d0c38-1000-45b3-be84-3c42fa60b013",
   "status": "updated",

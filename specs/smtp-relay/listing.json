@@ -36,7 +36,7 @@
   "name": "smtp-relay",
   "service_options": {
     "ops_testing_parameters": {
-      "host": "mailpit.svcmarket.com",
+      "host": "mailpit.unitysvc.dev",
       "password_secret": "SMTP_RELAY_PASSWORD",
       "port": 1025,
       "tls": false,
@@ -64,8 +64,8 @@
   "user_parameters_schema": {
     "properties": {
       "host": {
-        "default": "mailpit.svcmarket.com",
-        "description": "SMTP host (default: mailpit.svcmarket.com \u2014 the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
+        "default": "mailpit.unitysvc.dev",
+        "description": "SMTP host (default: mailpit.unitysvc.dev \u2014 the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
         "type": "string"
       },
       "password_secret": {

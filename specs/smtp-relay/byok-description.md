@@ -62,6 +62,6 @@ The non-secret pieces — `host`, `port`, `username` — are set **directly** as
    { "host": "smtp.sendgrid.net", "port": 587, "username": "apikey",        "tls": true, "password_secret": "SENDGRID_SMTP_PASSWORD" }
    ```
 
-   Enroll with no params at all and you land on the platform's mailpit test sink (`mailpit.svcmarket.com:1025`) — handy for a first smoke test.
+   Enroll with no params at all and you land on the platform's mailpit test sink (`mailpit.unitysvc.dev:1025`) — handy for a first smoke test.
 
 3. **Send mail** to each enrollment's unique `/e/<code>` gateway address, using the **enrollment code as the SMTP username** and your svcpass as the SMTP password. Switching upstreams is a one-value change to the SMTP username.

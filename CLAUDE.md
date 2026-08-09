@@ -1,57 +1,55 @@
 # CLAUDE.md — unitysvc-services-smtp
 
-This repository holds **UnitySVC service data** — declarative `offering.json` +
-`listing.json` files (plus tests) that define services published to the UnitySVC
-gateway/marketplace. It is *data*, not application code; there is no server here.
-The authoritative, always-current workflow is the `writing-unitysvc-services`
-skill — this file is the quick, repo-local reference.
+This repository holds **UnitySVC service data** — the declarative files (plus
+tests) that define services published to the UnitySVC gateway/marketplace. It is
+*data*, not application code; there is no server here. **`unitysvc-sellers`
+(repo + `docs/`) is the authoritative standard** for this format and the CLI;
+this file is the quick, repo-local reference and defers to those docs.
 
-## What a service is
+## Where the data lives and in what shape
 
-- **offering** (`offering.json`, exactly one) — technical spec:
-  `upstream_access_config` (upstream URL, auth, channels), `service_type`,
-  `capabilities`, `payout_price`.
-- **listing** (`listing.json`, one or more) — customer-facing: gateway
-  `user_access_interfaces` (base_url), `list_price`, `documents` (connectivity
-  test + code examples), `user_parameters_schema`.
-- **provider.json** — the provider record (accompanies each service folder).
-- **service.json** — identity sidecar `{ "service_id": "…" }` (see below).
+**All service data lives under `specs/`** (files are JSON or TOML — role is fixed
+by filename: `offering.json`, `listing.json`, `provider.json`, `service.json`).
+Author each service one of **two ways**:
 
-The backend derives service identity: `service.name ← listing.name`,
-`display_name ← listing/offering display_name`, `status ← worst-of component
-statuses.
-
-## Environment (required for anything touching staging)
-
-`specs upload`, `services list/show/run-tests`, and any staging curl need the
-seller key in the environment — source it first:
-
-    source ~/.zshrc     # UNITYSVC_SELLER_API_KEY, UNITYSVC_SELLER_API_URL, UNITYSVC_API_KEY
-
-Invoke the CLI as `usvc_seller …` if on PATH, else
-`uvx --from unitysvc-sellers usvc_seller …`, else from a local checkout
-`uv run --project ~/unitysvc/unitysvc-sellers usvc_seller …`. A 401 or
-"Missing svcpass API key" means you forgot to source.
-
-## File layout
-
-Concrete service (hand-authored):
+**(a) Full spec** — a concrete folder per service:
 
     specs/<provider>/<service-name>/
-      ├── offering.json      # exactly one
-      ├── listing.json       # one or more (variants: listing-<x>.json, name "<p>/<s>@<variant>")
-      ├── provider.json
-      ├── service.json       # { "service_id": "…" } — commit it, minimal form
+      ├── offering.json      # exactly one — technical spec (upstream, auth, channels, payout)
+      ├── listing.json       # one or more — customer-facing (base_url, price, docs, params)
+      ├── provider.json      # the provider record
+      ├── service.json       # { "service_id": "…" } — identity sidecar; commit it, minimal form
       └── <docs>             # connectivity.*.j2, description.md, code-example.*.j2
 
-Param-file service (one template renders many — for large catalogs):
+**(b) Templates + param data** — one template renders many services (large
+catalogs, notification-channel fleets):
 
     templates/<template>/{provider.json, offering.json.j2, listing.json.j2}
     specs/<provider>/<name>.json          # { "template": "<template>", "parameters": {…} }
     specs/<provider>/<name>.service.json  # identity sidecar
     # Commit the param file + its .service.json — NEVER the rendered folder.
+    # specs commands render param files into a temp folder ephemerally.
 
-The folder (or param-file stem) under `specs/<provider>/` **is** the service name.
+Either way, the folder (or param-file stem) under `specs/<provider>/` **is** the
+service name. The backend derives identity: `service.name ← listing.name`,
+`display_name ← listing/offering display_name`, `status ← worst-of components`.
+
+## Environment (required for tests and anything touching staging)
+
+Load the repo's committed secrets manifest first — it provides the
+`customer_secrets` values local tests resolve (and is the CI seed source):
+
+    set -a; . ./seller.secrets.txt; set +a      # == .env.example (a symlink to it)
+
+You also need the seller credentials in your environment —
+`UNITYSVC_SELLER_API_KEY`, `UNITYSVC_SELLER_API_URL`
+(`https://seller.staging.unitysvc.com/v1/`), and `UNITYSVC_API_KEY` (the svcpass
+key used as a gateway customer). A 401 / "Missing svcpass API key" means the
+environment isn't loaded.
+
+Invoke the CLI as `usvc_seller …` if on PATH, else
+`uvx --from unitysvc-sellers usvc_seller …`, else from a local checkout
+`uv run --project ~/unitysvc/unitysvc-sellers usvc_seller …`.
 
 ## Naming rules (the validator rejects violations)
 
@@ -70,13 +68,13 @@ The folder (or param-file stem) under `specs/<provider>/` **is** the service nam
 
 Every `${ customer_secrets.<NAME> }` referenced in a listing/offering needs a
 same-named **seller** secret on the platform (the gateway-side test plugs in a
-real value). Seed them from a repo-committed manifest, never GitHub variables:
+real value). Seed them from the repo-committed manifest, never GitHub variables:
 
 - Commit `seller.secrets.txt` (symlinked as `.env.example`) at the repo root:
   `export NAME="value"` lines, each preceded by a `#` comment block that is the
-  **customer-facing** description (what the customer sets + how to get it). It is
-  both shell-sourceable for local tests and the upload workflow's seed source
-  (`usvc_seller secrets upload .env.example`).
+  **customer-facing** description (what the customer sets + how to obtain it). It
+  is both shell-sourceable for local tests and the upload workflow's seed source
+  (`usvc_seller secrets upload seller.secrets.txt`).
 - Seed the **mock** value; keep the manifest exhaustive —
   `grep -rho '\${ customer_secrets\.[A-Z_]*' specs/ | sort -u` should have no
   name missing from it. A missing name is silently skipped ⇒ the gateway test
@@ -130,16 +128,26 @@ real value). Seed them from a repo-committed manifest, never GitHub variables:
   (name/status/time_created) — that is transient tool output; revert to minimal
   before committing.
 
-## Connectivity test is mandatory
+## Tests: connectivity is mandatory; presets come from unitysvc-data
 
-Every service needs at least one connectivity-test document — a `$doc_preset`
-(`llm_connectivity`, `api_connectivity`, …) or a local `connectivity.*.j2`.
-Without it the service is untestable and cannot activate.
+Every service needs at least one connectivity-test document. Two forms:
 
-## Authoritative docs (evolve with the platform)
+- A **`$doc_preset`** from the **`unitysvc-data`** package
+  (`~/unitysvc/unitysvc-data`) — e.g. `llm_connectivity`, `api_connectivity`,
+  `smtp_connectivity_v2`. That repo is where test/connectivity presets live and
+  are added.
+- A **local Jinja file** (`connectivity.*.j2`, `code-example.*.j2`) under the
+  service dir for custom probes — handle both modes via the `local_testing` flag.
 
-`~/unitysvc/unitysvc-sellers/docs/`: `file-schemas.md`, `pricing.md`,
-`naming-conventions.md`, `secrets-and-variables.md`, `service-templates.md`,
-`documenting-services.md`, `cli-reference.md`, `seller-lifecycle.md`. Closest
-working examples live in `~/unitysvc/unitysvc-services-demo/specs/unitysvc-demo/`.
-When this file conflicts with those docs, the docs win.
+Without a connectivity test the service is untestable and cannot activate.
+
+## Standards & references
+
+- **`unitysvc-sellers`** — the authoritative standard. Read
+  `~/unitysvc/unitysvc-sellers/docs/`: `file-schemas.md`, `pricing.md`,
+  `naming-conventions.md`, `secrets-and-variables.md`, `service-templates.md`,
+  `documenting-services.md`, `cli-reference.md`, `seller-lifecycle.md`. When this
+  file conflicts with those docs, the docs win.
+- **`unitysvc-data`** — connectivity-test / code-example presets (`$doc_preset`).
+- **`unitysvc-services-demo`** — closest working examples of every pattern:
+  `~/unitysvc/unitysvc-services-demo/specs/unitysvc-demo/`.

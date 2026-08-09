@@ -1,0 +1,43 @@
+#!/bin/bash
+# smtp-to-http forwards an inbound email to your HTTP receiver as the full
+# email envelope (from, to, subject, text_body, html_body, headers,
+# attachments, spf/dkim).
+#
+# Here the receiver is the platform sink (sink.unitysvc.dev), which records each
+# request, so we can CONFIRM delivery end to end: send with a unique marker in
+# the subject, then long-poll the sink for a recorded request carrying it.
+set -euo pipefail
+
+SINK="https://sink.unitysvc.dev"                    # = HTTP_RELAY_BASE_URL receiver
+MARKER="smtp2http-$(date +%s)-${RANDOM}"            # unique per run
+SUBJECT="smtp-to-http e2e ${MARKER}"
+
+{% if local_testing %}
+# Upstream test: POST the email envelope straight to the receiver (the sink).
+status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "${SINK}" \
+  -H 'Content-Type: application/json' \
+  --data "{\"from\":\"test@example.com\",\"to\":\"recipient@example.com\",\"subject\":\"${SUBJECT}\",\"text_body\":\"hello\"}")
+[ "$status" -ge 200 ] && [ "$status" -lt 300 ] || { echo "receiver returned HTTP $status" >&2; exit 1; }
+{% else %}
+# Gateway send: submit the email over SMTP; the gateway forwards the full
+# envelope (subject, text_body, headers, ...) as JSON to the receiver.
+curl --silent --show-error --ssl --url "{{ service_base_url }}" \
+  --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
+  --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
+  --upload-file - <<EMAIL
+From: test@example.com
+To: recipient@example.com
+Subject: ${SUBJECT}
+
+hello from smtp-to-http
+EMAIL
+{% endif %}
+
+# Confirm delivery by querying the receiver: the sink long-polls up to 30s for a
+# recorded request whose body carries our marker (the forwarded Subject).
+if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then
+  echo "delivered — sink recorded the forwarded email envelope (${MARKER})"
+else
+  echo "NOT delivered — no request carrying ${MARKER} reached ${SINK}" >&2
+  exit 1
+fi

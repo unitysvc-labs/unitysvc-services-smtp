@@ -12,6 +12,22 @@
       "is_active": true,
       "is_public": true,
       "mime_type": "markdown"
+    },
+    "Python code example": {
+      "category": "code_example",
+      "description": "Send an email through the gateway (or POST the envelope to your receiver) in Python",
+      "file_path": "code-example.py.j2",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "python"
+    },
+    "Shell code example": {
+      "category": "code_example",
+      "description": "Send an email through the gateway with curl",
+      "file_path": "code-example.sh.j2",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "bash"
     }
   },
   "list_price": {
@@ -34,7 +50,7 @@
   "service_options": {
     "ops_testing_parameters": {
       "api_key_secret": "HTTP_RELAY_API_KEY",
-      "base_url": "https://echo.unitysvc.dev"
+      "base_url": "https://sink.unitysvc.dev"
     }
   },
   "status": "ready",

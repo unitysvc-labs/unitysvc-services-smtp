@@ -137,13 +137,17 @@ other `services` commands.
 
 ## service.json sidecar
 
-- Auto-written on the first successful `specs upload`; carries the backend
-  `service_id` so later uploads target the existing service. **Commit it, in the
-  minimal form** `{ "service_id": "…" }`.
-- Don't hand-edit. Delete it only to deliberately re-upload as a brand-new
-  service. `run-tests`/`upload` may write back a richer sidecar
-  (name/status/time_created) — that is transient tool output; revert to minimal
-  before committing.
+- Auto-written by `specs upload` (and the CI upload workflow); carries the
+  backend `service_id` so later uploads target the existing service. **Commit
+  whatever the tool writes — don't hand-edit.** `service_id` is the only
+  load-bearing field.
+- Two committed shapes, both valid: a **concrete** `service.json` carries the CI
+  write-back's richer form (`service_id` + derived `name` / `display_name` /
+  `status` / `time_created`); a **param-file** `<name>.service.json` stays
+  minimal `{ "service_id": "…" }`.
+- Delete the sidecar only to deliberately re-upload as a brand-new service. If a
+  rename leaves the derived fields stale (`name` of the old service), correct
+  them or let the next upload/CI write-back refresh them.
 
 ## Tests: connectivity is mandatory; presets come from unitysvc-data
 

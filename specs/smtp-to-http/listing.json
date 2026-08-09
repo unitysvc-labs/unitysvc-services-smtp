@@ -1,13 +1,13 @@
 {
   "currency": "USD",
-  "display_name": "SMTP-to-Email Bridge (Bring Your Own Endpoint)",
+  "display_name": "SMTP-to-HTTP Bridge (Bring Your Own Endpoint)",
   "documents": {
     "Connectivity test": {
       "$doc_preset": "smtp_connectivity_v2"
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "How the SMTP-to-Email bridge works and the two ways to use it \u2014 a stored receiver (free) or per-enrollment receivers (metered)",
+      "description": "How the SMTP-to-HTTP bridge works and the two ways to use it \u2014 a stored receiver (free) or per-enrollment receivers (metered)",
       "file_path": "description.md",
       "is_active": true,
       "is_public": true,
@@ -30,7 +30,7 @@
     "default": "byok",
     "type": "channel"
   },
-  "name": "smtp-to-email",
+  "name": "smtp-to-http",
   "service_options": {
     "ops_testing_parameters": {
       "api_key_secret": "HTTP_RELAY_API_KEY",
@@ -51,7 +51,7 @@
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
       "routing_key": {
-        "username": "smtp-to-email"
+        "username": "smtp-to-http"
       }
     }
   },

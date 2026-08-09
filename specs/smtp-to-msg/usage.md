@@ -1,6 +1,6 @@
 # SMTP-to-Message Bridge — `smtp-to-msg`
 
-Send an email to the UnitySVC SMTP gateway and it is delivered to your own HTTP endpoint as a compact JSON notification — `{title, body, type, format}`, with the subject as `title` and the body as `body`. Any system that can send email becomes a webhook to a receiver you control. For the full message (all headers, attachments, both bodies, DKIM/SPF), use `smtp-to-email` instead.
+Send an email to the UnitySVC SMTP gateway and it is delivered to your own HTTP endpoint as a compact JSON notification — `{title, body, type, format}`, with the subject as `title` and the body as `body`. Any system that can send email becomes a webhook to a receiver you control. For the full message (all headers, attachments, both bodies, DKIM/SPF), use `smtp-to-http` instead.
 
 ## What your endpoint receives
 

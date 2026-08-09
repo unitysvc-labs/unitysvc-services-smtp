@@ -20,7 +20,7 @@ status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "${SINK}" \
 {% else %}
 # Gateway send: submit the email over SMTP; the gateway composes the envelope
 # (Subject -> title, body -> body) and POSTs it to the receiver.
-curl --silent --show-error --ssl-reqd --url "{{ service_base_url }}" \
+curl --silent --show-error --ssl --url "{{ service_base_url }}" \
   --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
   --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
   --upload-file - <<EMAIL

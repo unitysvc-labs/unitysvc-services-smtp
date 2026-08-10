@@ -34,6 +34,22 @@ Either way, the folder (or param-file stem) under `specs/<provider>/` **is** the
 service name. The backend derives identity: `service.name ← listing.name`,
 `display_name ← listing/offering display_name`, `status ← worst-of components`.
 
+## Offering `description` convention — three paragraphs
+
+The `offering.json` `description` (the service's marketplace description) MUST be
+**exactly three paragraphs, separated by `\n\n`**:
+
+1. **Brief** — a one-line summary of what the service provides. Keep it under
+   **200 characters**. This is the preview/teaser line.
+2. **Detail** — what the service does in depth: the mechanism, the upstream it
+   fronts, how bytes/requests flow, billing basis.
+3. **How to use** — how a customer actually consumes it: the channels (e.g.
+   `byok` vs `plus`), where each is reached, what config each needs. Point at the
+   longer "How to use this service" doc for full setup.
+
+The richer, table-driven walkthrough still lives in the service's
+`*-description.md` doc; the three-paragraph `description` is the concise summary.
+
 ## Environment (required for tests and anything touching staging)
 
 Load the repo's committed secrets manifest first — it provides the

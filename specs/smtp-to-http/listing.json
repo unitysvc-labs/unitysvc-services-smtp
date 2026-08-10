@@ -3,7 +3,14 @@
   "display_name": "SMTP-to-HTTP Bridge (Bring Your Own Endpoint)",
   "documents": {
     "Connectivity test": {
-      "$doc_preset": "smtp_connectivity_v2"
+      "category": "connectivity_test",
+      "file_path": "connectivity.sh.j2",
+      "is_active": true,
+      "is_public": false,
+      "meta": {
+        "output_contains": "connectivity ok"
+      },
+      "mime_type": "bash"
     },
     "How to use this service": {
       "category": "getting_started",

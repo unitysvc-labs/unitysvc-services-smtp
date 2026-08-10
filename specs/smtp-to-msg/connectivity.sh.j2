@@ -1,0 +1,50 @@
+#!/bin/bash
+# Connectivity test for an SMTP-gateway -> HTTP-upstream bridge.
+#
+# Unlike a plain SMTP relay (whose upstream is itself a mail server), this
+# service's UPSTREAM is an HTTP receiver — so the smtp_connectivity_v2 preset,
+# which probes {{ host }}:{{ port }} for a "220" greeting, has no SMTP host to
+# probe in local mode. Instead:
+#   - local mode:   verify the HTTP receiver (the platform sink) is reachable.
+#   - gateway mode: the entry point IS SMTP, so verify the gateway's 220 greeting
+#                   (same logic as smtp_connectivity_v2).
+set -o pipefail
+
+{% if local_testing %}
+SINK="https://sink.unitysvc.dev"     # the HTTP receiver under test (= HTTP_RELAY_BASE_URL)
+status=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "${SINK}/" || echo 000)
+if [ "$status" -ge 200 ] && [ "$status" -lt 500 ]; then
+    echo "connectivity ok (receiver ${SINK} returned HTTP ${status})"
+    exit 0
+fi
+echo "connectivity failed: HTTP receiver ${SINK} unreachable (HTTP ${status})" >&2
+exit 1
+{% else %}
+USE_TLS=false
+URL="{{ service_base_url }}"
+if [[ "$URL" == smtps://* ]]; then
+    USE_TLS=true
+    stripped="${URL#smtps://}"
+else
+    stripped="${URL#smtp://}"
+fi
+# Bare host[:port] authority — drop any "/path" and trailing "@<channel>".
+stripped="${stripped%%/*}"
+stripped="${stripped%%@*}"
+HOST="${stripped%%:*}"
+PORT="${stripped#*:}"
+[ "$PORT" = "$HOST" ] && PORT=587
+PORT="${PORT:-587}"
+
+if [ "$USE_TLS" = "true" ]; then
+    greeting=$( (echo "QUIT"; sleep 1) | openssl s_client -connect "$HOST:$PORT" -quiet 2>/dev/null | head -1 )
+else
+    greeting=$( (echo "QUIT"; sleep 1) | nc -w 5 "$HOST" "$PORT" 2>/dev/null | head -1 )
+fi
+if [[ "$greeting" == "220 "* ]]; then
+    echo "connectivity ok ($greeting)"
+    exit 0
+fi
+echo "connectivity failed: expected '220 ...' greeting from ${HOST}:${PORT}, got: ${greeting:-<no response>}" >&2
+exit 1
+{% endif %}

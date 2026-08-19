@@ -8,14 +8,14 @@ You supply the receiver; UnitySVC handles the SMTP-to-HTTP plumbing. If you want
 
 When mail arrives the gateway POSTs a single JSON body containing the **full email envelope**, structured for downstream code:
 
-| Field | Meaning |
-|---|---|
-| `from`, `to`, `cc`, `bcc`, `reply_to` | RFC addresses |
-| `subject`, `date`, `message_id` | Standard email headers |
-| `text_body`, `html_body` | Both bodies if present (else `null`) |
-| `headers` | All raw headers, in order |
-| `attachments[]` | `filename`, `content_type`, `size`, base64-encoded `content` |
-| `spf`, `dkim`, `dmarc` | Authentication results from the gateway |
+| Field                                 | Meaning                                                      |
+| ------------------------------------- | ------------------------------------------------------------ |
+| `from`, `to`, `cc`, `bcc`, `reply_to` | RFC addresses                                                |
+| `subject`, `date`, `message_id`       | Standard email headers                                       |
+| `text_body`, `html_body`              | Both bodies if present (else `null`)                         |
+| `headers`                             | All raw headers, in order                                    |
+| `attachments[]`                       | `filename`, `content_type`, `size`, base64-encoded `content` |
+| `spf`, `dkim`, `dmarc`                | Authentication results from the gateway                      |
 
 This is the **faithful** rendering — every field present in the original email is present in the POST.
 
@@ -27,22 +27,22 @@ In both channels the **gateway** authenticates you via your UnitySVC svcpass, us
 
 This service exposes two **upstream access channels**. Pick whichever fits — you can use both. The email envelope the receiver gets is identical regardless of channel; only **where the destination URL and bearer token come from** changes.
 
-| | `byok` — stored receiver | `plus` — per-enrollment receivers |
-|---|---|---|
-| Best for | one fixed receiver | many email-to-webhook routes under one account |
-| Destination URL | `HTTP_RELAY_BASE_URL` customer secret | a `base_url` parameter per enrollment |
-| Bearer token | `HTTP_RELAY_API_KEY` customer secret (optional) | the secret named by the `api_key_secret` parameter (optional) |
-| SMTP username | `smtp-to-http` | the enrollment's 6-character code |
-| Reached at | the canonical gateway address | a unique `/e/<code>` address per enrollment |
-| Price | **free** | **$0.001 / email** ($1 per 1,000) |
+|                 | `byok` — stored receiver                        | `plus` — per-enrollment receivers                             |
+| --------------- | ----------------------------------------------- | ------------------------------------------------------------- |
+| Best for        | one fixed receiver                              | many email-to-webhook routes under one account                |
+| Destination URL | `SMTP_HTTP_RELAY_BASE_URL` customer secret      | a `base_url` parameter per enrollment                         |
+| Bearer token    | `SMTP_HTTP_RELAY_API_KEY` customer secret (optional) | the secret named by the `api_key_secret` parameter (optional) |
+| SMTP username   | `smtp-to-http`                                  | the enrollment's 6-character code                             |
+| Reached at      | the canonical gateway address                   | a unique `/e/<code>` address per enrollment                   |
+| Price           | **free**                                        | **$0.001 / email** ($1 per 1,000)                             |
 
 ### Method 1 — Stored receiver (`byok`, free)
 
 One receiver, configured once via customer secrets.
 
 1. **Set your receiver** as customer secrets:
-   - `HTTP_RELAY_BASE_URL` — your HTTP receiver URL (e.g. `https://hooks.example.com/inbound-mail`)
-   - `HTTP_RELAY_API_KEY` — *(optional)* bearer token; omit when the receiver is public.
+   - `SMTP_HTTP_RELAY_BASE_URL` — your HTTP receiver URL (e.g. `https://hooks.example.com/inbound-mail`)
+   - `SMTP_HTTP_RELAY_API_KEY` — _(optional)_ bearer token; omit when the receiver is public.
 2. **Send email** to the gateway with SMTP username `smtp-to-http` and your svcpass as the password. Any `To:` address works — routing is by SMTP user, not recipient.
 
 A minimal Python receiver:
@@ -81,9 +81,9 @@ with smtplib.SMTP(os.environ["SMTP_GATEWAY_HOST"], int(os.environ["SMTP_GATEWAY_
 
 Run **multiple** email-to-webhook routes under one account — e.g. `sales@…` → CRM webhook, `support@…` → ticket queue, `ops@…` → on-call paging. Each enrollment binds:
 
-| Parameter | Required | Meaning |
-|---|---|---|
-| `base_url` | **yes** | HTTP receiver URL for this enrollment, e.g. `https://hooks.example.com/sales-inbound`. A literal, not a secret. |
+| Parameter        | Required | Meaning                                                                                                                                           |
+| ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base_url`       | **yes**  | HTTP receiver URL for this enrollment, e.g. `https://hooks.example.com/sales-inbound`. A literal, not a secret.                                   |
 | `api_key_secret` | optional | Name of a customer secret holding this receiver's bearer token, forwarded as `Authorization: Bearer <secret>`. Empty when the receiver is public. |
 
 The `base_url` is fixed per enrollment; re-enroll (or update) to move it. The `api_key_secret` value is resolved at request time, so rotating a token is a `usvc_seller secrets set` away — no re-enroll.
@@ -98,11 +98,19 @@ The `base_url` is fixed per enrollment; re-enroll (or update) to move it. The `a
 2. **Enroll, one per route**, supplying the destination inline:
 
    ```json
-   { "base_url": "https://crm.example.com/inbound-mail",      "api_key_secret": "CRM_API_KEY" }
+   {
+     "base_url": "https://crm.example.com/inbound-mail",
+     "api_key_secret": "CRM_API_KEY"
+   }
    ```
+
    ```json
-   { "base_url": "https://helpdesk.example.com/email-ingest", "api_key_secret": "HELPDESK_API_KEY" }
+   {
+     "base_url": "https://helpdesk.example.com/email-ingest",
+     "api_key_secret": "HELPDESK_API_KEY"
+   }
    ```
+
    ```json
    { "base_url": "https://oncall.example.com/page" }
    ```
@@ -119,7 +127,7 @@ The `base_url` is fixed per enrollment; re-enroll (or update) to move it. The `a
 
 ## Troubleshooting
 
-- **No POST arrives** — confirm the destination is set (`HTTP_RELAY_BASE_URL` for `byok`, or the enrollment's `base_url` for `plus`); confirm the receiver is publicly reachable; confirm the SMTP login succeeded (a clean `250` only follows a valid svcpass auth).
-- **POST arrives, receiver 401s** — bearer-token mismatch; check `HTTP_RELAY_API_KEY` (byok) or the enrollment's `api_key_secret` value, and that the receiver expects `Authorization: Bearer`.
+- **No POST arrives** — confirm the destination is set (`SMTP_HTTP_RELAY_BASE_URL` for `byok`, or the enrollment's `base_url` for `plus`); confirm the receiver is publicly reachable; confirm the SMTP login succeeded (a clean `250` only follows a valid svcpass auth).
+- **POST arrives, receiver 401s** — bearer-token mismatch; check `SMTP_HTTP_RELAY_API_KEY` (byok) or the enrollment's `api_key_secret` value, and that the receiver expects `Authorization: Bearer`.
 - **All `plus` emails hit the same receiver** — you used the wrong enrollment code as the SMTP username. Each route has its own.
 - **Attachments missing** — they're in `attachments[].content` as base64; some clients show only `text_body`/`html_body`.

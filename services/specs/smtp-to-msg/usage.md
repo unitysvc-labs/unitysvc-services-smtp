@@ -4,22 +4,22 @@ Send an email to the UnitySVC SMTP gateway and it is delivered to your own HTTP 
 
 ## What your endpoint receives
 
-| Field | Source | Default |
-|---|---|---|
-| `title`  | email `Subject` | `""` |
-| `body`   | `text_body`, else stripped `html_body` | `""` |
-| `type`   | always `info` (advisory) | `info` |
-| `format` | `text` or `html`, from the body's content type | `text` |
+| Field    | Source                                         | Default |
+| -------- | ---------------------------------------------- | ------- |
+| `title`  | email `Subject`                                | `""`    |
+| `body`   | `text_body`, else stripped `html_body`         | `""`    |
+| `type`   | always `info` (advisory)                       | `info`  |
+| `format` | `text` or `html`, from the body's content type | `text`  |
 
 ## Channels
 
 Authenticate with your svcpass as the SMTP password, then pick a channel — you can use both:
 
-| | `byok` — stored receiver (free) | `plus` — per-enrollment receivers ($0.001/email) |
-|---|---|---|
-| Destination | `HTTP_RELAY_BASE_URL` secret (+ optional `HTTP_RELAY_API_KEY` bearer) | a `base_url` per enrollment (+ optional `api_key_secret`) |
-| SMTP username | `smtp-to-msg` | the enrollment's 6-character code |
-| Reached at | the canonical gateway address | a unique `/e/<code>` address |
+|               | `byok` — stored receiver (free)                                            | `plus` — per-enrollment receivers ($0.001/email)          |
+| ------------- | -------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Destination   | `SMTP_HTTP_RELAY_BASE_URL` secret (+ optional `SMTP_HTTP_RELAY_API_KEY` bearer) | a `base_url` per enrollment (+ optional `api_key_secret`) |
+| SMTP username | `smtp-to-msg`                                                              | the enrollment's 6-character code                         |
+| Reached at    | the canonical gateway address                                              | a unique `/e/<code>` address                              |
 
 See the attached **shell** and **python** code examples for how to send. Any endpoint that accepts `POST application/json` with the envelope works; the platform sink `https://sink.unitysvc.dev` records each POST — query it at `/retrieve?search=<marker>&wait=<s>` to confirm delivery in a smoke test.
 

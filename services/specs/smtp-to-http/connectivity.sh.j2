@@ -11,7 +11,7 @@
 set -o pipefail
 
 {% if local_testing %}
-SINK="https://sink.unitysvc.dev"     # the HTTP receiver under test (= HTTP_RELAY_BASE_URL)
+SINK="https://sink.unitysvc.dev"     # the HTTP receiver under test (= SMTP_HTTP_RELAY_BASE_URL)
 status=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "${SINK}/" || echo 000)
 if [ "$status" -ge 200 ] && [ "$status" -lt 500 ]; then
     echo "connectivity ok (receiver ${SINK} returned HTTP ${status})"

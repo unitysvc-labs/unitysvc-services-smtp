@@ -2,7 +2,7 @@
 
 This repository holds **UnitySVC service data** — the declarative files (plus
 tests) that define services published to the UnitySVC gateway/marketplace. It is
-*data*, not application code; there is no server here. **`unitysvc-sellers`
+_data_, not application code; there is no server here. **`unitysvc-sellers`
 (repo + `docs/`) is the authoritative standard** for this format and the CLI;
 this file is the quick, repo-local reference and defers to those docs.
 
@@ -95,7 +95,7 @@ real value). Seed them from the repo-committed manifest, never GitHub variables:
   `grep -rho '\${ customer_secrets\.[A-Z_]*' services/specs/ | sort -u` should have no
   name missing from it. A missing name is silently skipped ⇒ the gateway test
   fails with no obvious cause.
-- **Namespace** secret names by service (`HTTP_RELAY_BASE_URL`,
+- **Namespace** secret names by service (`SMTP_HTTP_RELAY_BASE_URL`,
   `SMTP_RELAY_PASSWORD`, `<PROVIDER>_API_KEY`) — bare names collide.
 - Sensitive (key/password/token) → `customer_secrets`. Operational
   (host/port/url/flag) → a direct `{{ params.X }}` with a default, not a secret.

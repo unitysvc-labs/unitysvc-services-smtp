@@ -26,6 +26,9 @@
       "file_path": "code-example.py.j2",
       "is_active": true,
       "is_public": true,
+      "meta": {
+        "timeout": 90
+      },
       "mime_type": "python"
     },
     "Shell code example": {
@@ -34,6 +37,9 @@
       "file_path": "code-example.sh.j2",
       "is_active": true,
       "is_public": true,
+      "meta": {
+        "timeout": 90
+      },
       "mime_type": "bash"
     }
   },

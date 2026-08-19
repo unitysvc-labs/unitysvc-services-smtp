@@ -26,6 +26,9 @@
       "file_path": "code-example.py.j2",
       "is_active": true,
       "is_public": true,
+      "meta": {
+        "timeout": 90
+      },
       "mime_type": "python"
     },
     "Shell code example": {
@@ -34,6 +37,9 @@
       "file_path": "code-example.sh.j2",
       "is_active": true,
       "is_public": true,
+      "meta": {
+        "timeout": 90
+      },
       "mime_type": "bash"
     }
   },
@@ -56,7 +62,7 @@
   "name": "smtp-to-msg",
   "service_options": {
     "ops_testing_parameters": {
-      "api_key_secret": "HTTP_RELAY_API_KEY",
+      "api_key_secret": "SMTP_HTTP_RELAY_API_KEY",
       "base_url": "https://sink.unitysvc.dev"
     }
   },

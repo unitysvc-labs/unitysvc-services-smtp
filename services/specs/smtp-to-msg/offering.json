@@ -2,7 +2,7 @@
   "capabilities": [
     "notification"
   ],
-  "description": "Use it when a sender can produce email but the receiving workflow expects a webhook. The SMTP gateway accepts the message, authenticates and routes it through UnitySVC, converts the email subject and body into a compact `{title, body, type, format}` JSON payload, and forwards that summary to your HTTP receiver. If you need full raw email delivery with headers, attachments, and both body formats, use `smtp-to-http` instead.\n\nUse the free `byok` channel to forward every message to one receiver stored in customer secrets (`HTTP_RELAY_BASE_URL`, optional `HTTP_RELAY_API_KEY`). Use the metered `plus` channel to route different mailbox enrollments to different receiver URLs; each enrollment binds its own `base_url`, uses a unique SMTP username, and is billed at $1 per 1,000 emails. See \u201cHow to use this service\u201d for setup and examples.",
+  "description": "Use it when a sender can produce email but the receiving workflow expects a webhook. The SMTP gateway accepts the message, authenticates and routes it through UnitySVC, converts the email subject and body into a compact `{title, body, type, format}` JSON payload, and forwards that summary to your HTTP receiver. If you need full raw email delivery with headers, attachments, and both body formats, use `smtp-to-http` instead.\n\nUse the free `byok` channel to forward every message to one receiver stored in customer secrets (`SMTP_HTTP_RELAY_BASE_URL`, optional `SMTP_HTTP_RELAY_API_KEY`). Use the metered `plus` channel to route different mailbox enrollments to different receiver URLs; each enrollment binds its own `base_url`, uses a unique SMTP username, and is billed at $1 per 1,000 emails. See \u201cHow to use this service\u201d for setup and examples.",
   "name": "smtp-to-msg",
   "payout_price": {
     "description": "No platform commission \u2014 customer uses own HTTP receiver",
@@ -23,8 +23,8 @@
   "upstream_access_config": {
     "byok": {
       "access_method": "http",
-      "api_key": "${ customer_secrets.HTTP_RELAY_API_KEY ?? }",
-      "base_url": "${ customer_secrets.HTTP_RELAY_BASE_URL }",
+      "api_key": "${ customer_secrets.SMTP_HTTP_RELAY_API_KEY ?? }",
+      "base_url": "${ customer_secrets.SMTP_HTTP_RELAY_BASE_URL }",
       "is_active": true,
       "is_primary": true,
       "payload_format": "apprise"

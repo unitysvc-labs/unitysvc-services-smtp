@@ -18,7 +18,7 @@ from email.message import EmailMessage
 from urllib.parse import urlparse
 {% endif %}
 
-SINK = "https://sink.unitysvc.dev"  # = HTTP_RELAY_BASE_URL receiver
+SINK = "https://sink.unitysvc.dev"  # = SMTP_HTTP_RELAY_BASE_URL receiver
 marker = f"smtp2http-{int(time.time())}-{os.getpid()}"  # unique per run
 subject = f"smtp-to-http e2e {marker}"
 

@@ -7,7 +7,7 @@
 # the subject, then long-poll the sink for a recorded request carrying it.
 set -euo pipefail
 
-SINK="https://sink.unitysvc.dev"                    # = HTTP_RELAY_BASE_URL receiver
+SINK="https://sink.unitysvc.dev"                    # = SMTP_HTTP_RELAY_BASE_URL receiver
 MARKER="smtp2msg-$(date +%s)-${RANDOM}"             # unique per run
 SUBJECT="smtp-to-msg e2e ${MARKER}"
 

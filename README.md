@@ -17,14 +17,14 @@ per enrollment.
 ### smtp-to-http
 
 SMTP-to-HTTP bridge — forwards inbound email to your HTTP endpoint as the faithful,
-lossless email envelope. `byok`: one receiver via `HTTP_RELAY_BASE_URL`. `plus`: many
+lossless email envelope. `byok`: one receiver via `SMTP_HTTP_RELAY_BASE_URL`. `plus`: many
 email-to-webhook routes, one per enrollment.
 
 ### smtp-to-msg
 
 SMTP-to-Message bridge — forwards inbound email to your HTTP endpoint as the strict
 `{title, body, type, format}` Apprise notification envelope. `byok`: one receiver via
-`HTTP_RELAY_BASE_URL`. `plus`: many Apprise receivers, one per enrollment.
+`SMTP_HTTP_RELAY_BASE_URL`. `plus`: many Apprise receivers, one per enrollment.
 
 ## Setup
 

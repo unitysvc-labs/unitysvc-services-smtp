@@ -22,7 +22,7 @@
     }
   },
   "list_price": {
-    "description": "Free — the ingress hop is not billed; each downstream notification channel bills on its own listing",
+    "description": "Free",
     "price": "0",
     "type": "constant"
   },

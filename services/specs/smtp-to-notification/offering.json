@@ -2,7 +2,7 @@
   "capabilities": [
     "notification"
   ],
-  "description": "Send an email and have it fan out to every notification channel you have configured \u2014 no receiver to run, no enrollment, no configuration.\n\nThe SMTP gateway accepts the message, authenticates it with your UnitySVC API key (used as the SMTP password), converts the subject and body into the standard `{title, body, type, format}` envelope, and POSTs it to your own `/b/notification` broadcast group. That group fans the envelope out to whatever destinations you have added to it \u2014 Discord, Slack, ntfy, email, and so on. The destination is fixed to your own group and is not customer-configurable, so the forwarded credential never leaves the platform. Delivery of each downstream channel is billed by that channel's own listing; this ingress hop is free.\n\nThere is nothing to enroll or configure: authenticate to the SMTP gateway with username `smtp-to-notification` and your UnitySVC API key as the password, then send a normal email. Add or remove destinations by editing your `/b/notification` group \u2014 this service always follows it. If your group does not exist yet, create it from the Notifications settings panel first. To reach an SMTP relay as well as notification channels, send to the `/b/smtp-notification` broadcast group instead. See \u201cHow to use this service\u201d for setup and examples.",
+  "description": "Send an email and have it fan out to every notification channel you have configured — no receiver to run, no enrollment, no configuration.\n\nThe SMTP gateway accepts the message, authenticates it with your UnitySVC API key (used as the SMTP password), converts the subject and body into the standard `{title, body, type, format}` envelope, and POSTs it to your own `/b/notification` broadcast group. That group fans the envelope out to whatever destinations you have added to it — Discord, Slack, ntfy, email, and so on. The destination is fixed to your own group and is not customer-configurable, so the forwarded credential never leaves the platform. Delivery of each downstream channel is billed by that channel's own listing; this ingress hop is free.\n\nThere is nothing to enroll or configure: authenticate to the SMTP gateway with username `smtp-to-notification` and your UnitySVC API key as the password, then send a normal email. Add or remove destinations by editing your `/b/notification` group — this service always follows it. If your group does not exist yet, create it from the Notifications settings panel first. To reach an SMTP relay as well as notification channels, send to the `/b/smtp-notification` broadcast group instead. See “How to use this service” for setup and examples.",
   "details": {
     "input_formats": [
       "smtp"
@@ -11,13 +11,13 @@
   "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Alert/SVG/ic_fluent_alert_32_color.svg",
   "name": "smtp-to-notification",
   "payout_price": {
-    "description": "No platform commission \u2014 fans out to the customer's own notification group",
+    "description": "No platform commission — fans out to the customer's own notification group",
     "percentage": "100.00",
     "type": "revenue_share"
   },
   "service_type": "notification",
   "status": "ready",
-  "summary": "Email in, notifications out: send a message to the gateway and it fans out through your own /b/notification group \u2014 no enrollment, no receiver, no configuration.",
+  "summary": "Email in, notifications out: send a message to the gateway and it fans out through your own /b/notification group — no enrollment, no receiver, no configuration.",
   "tags": [
     "broadcast",
     "email",

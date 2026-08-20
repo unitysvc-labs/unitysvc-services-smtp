@@ -2,7 +2,7 @@
   "capabilities": [
     "notification"
   ],
-  "description": "The POST carries the faithful envelope \u2014 `from`, `to`, `subject`, `text_body`, `html_body`, ordered headers, base64-encoded attachments, and SPF/DKIM/DMARC results \u2014 so downstream code sees everything the original message had. For a compact `{title, body, type, format}` notification instead of the full envelope, use the `smtp-to-msg` service.\n\nMulti-channel: the free `byok` channel forwards every message to one receiver you store once as customer secrets (`SMTP_HTTP_RELAY_BASE_URL`, optional `SMTP_HTTP_RELAY_API_KEY`), while the metered `plus` channel runs many email-to-webhook routes under a single account \u2014 each enrollment binds its own destination `base_url` and is reached at a unique `/e/<code>` address. See \u201cHow to use this service\u201d for both channels.",
+  "description": "The POST carries the faithful envelope — `from`, `to`, `subject`, `text_body`, `html_body`, ordered headers, base64-encoded attachments, and SPF/DKIM/DMARC results — so downstream code sees everything the original message had. For a compact `{title, body, type, format}` notification instead of the full envelope, use the `smtp-to-msg` service.\n\nMulti-channel: the free `byok` channel forwards every message to one receiver you store once as customer secrets (`SMTP_HTTP_RELAY_BASE_URL`, optional `SMTP_HTTP_RELAY_API_KEY`), while the metered `plus` channel runs many email-to-webhook routes under a single account — each enrollment binds its own destination `base_url` and is reached at a unique `/e/<code>` address. See “How to use this service” for both channels.",
   "details": {
     "input_formats": [
       "smtp"
@@ -11,13 +11,13 @@
   "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
   "name": "smtp-to-http",
   "payout_price": {
-    "description": "No platform commission \u2014 customer uses own HTTP receiver",
+    "description": "No platform commission — customer uses own HTTP receiver",
     "percentage": "100.00",
     "type": "revenue_share"
   },
   "service_type": "notification",
   "status": "ready",
-  "summary": "SMTP-to-HTTP bridge: receive email through the UnitySVC SMTP gateway and forward the full, lossless email envelope as an HTTP POST to your own endpoint \u2014 no SDK required.",
+  "summary": "SMTP-to-HTTP bridge: receive email through the UnitySVC SMTP gateway and forward the full, lossless email envelope as an HTTP POST to your own endpoint — no SDK required.",
   "tags": [
     "email",
     "enrollment",

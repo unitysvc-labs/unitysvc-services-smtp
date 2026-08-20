@@ -1,3 +1,8 @@
 {
+  "display_name": "SMTP-to-Notification Bridge",
+  "name": "smtp-to-notification",
+  "service_id": "d1a6efa5-385e-4824-8f7f-c936e8cc2c90",
+  "status": "created",
+  "time_created": "2026-08-20T22:11:01.198754Z",
   "upstream_test_status": "pass"
 }

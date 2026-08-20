@@ -4,14 +4,15 @@
 # Same shape as smtp-to-msg: the UPSTREAM is HTTP (the customer's own
 # /b/notification broadcast on the API gateway), while the ENTRY POINT is SMTP.
 #   - local mode:   verify the configured HTTP upstream is reachable. Under test
-#                   SMTP_NOTIFICATION_BASE_URL points at the platform sink via the
-#                   ops_customer -> seller-secret fallback, so this probes the sink
-#                   rather than a real customer's broadcast (which needs their key).
+#                   SMTP_HTTP_NOTIFICATION_BASE_URL points at the platform sink
+#                   via the ops_customer -> seller-secret fallback, so this probes
+#                   the sink rather than a real customer's broadcast (which would
+#                   need their key).
 #   - gateway mode: the entry point IS SMTP, so verify the gateway's 220 greeting.
 set -o pipefail
 
 {% if local_testing %}
-UPSTREAM="${SMTP_NOTIFICATION_BASE_URL:-https://sink.unitysvc.dev}"
+UPSTREAM="${SMTP_HTTP_NOTIFICATION_BASE_URL:-https://sink.unitysvc.dev}"
 status=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "${UPSTREAM%/}/" || echo 000)
 # Any non-5xx answer proves the host is up and routing; 401/404 are expected here
 # because this probe deliberately carries no customer credential.

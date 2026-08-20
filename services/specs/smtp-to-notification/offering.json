@@ -30,7 +30,7 @@
     "default": {
       "access_method": "http",
       "auth_mode": "forward",
-      "base_url": "${ customer_secrets.SMTP_NOTIFICATION_BASE_URL ?? https://gateway.unitysvc.com/b/notification }",
+      "base_url": "${ customer_secrets.SMTP_HTTP_NOTIFICATION_BASE_URL ?? https://gateway.unitysvc.com/b/notification }",
       "is_active": true,
       "is_primary": true,
       "payload_format": "apprise"

@@ -1,0 +1,52 @@
+#!/bin/bash
+# Connectivity test for the SMTP -> /b/notification bridge.
+#
+# Same shape as smtp-to-msg: the UPSTREAM is HTTP (the customer's own
+# /b/notification broadcast on the API gateway), while the ENTRY POINT is SMTP.
+#   - local mode:   verify the configured HTTP upstream is reachable. Under test
+#                   SMTP_NOTIFICATION_BASE_URL points at the platform sink via the
+#                   ops_customer -> seller-secret fallback, so this probes the sink
+#                   rather than a real customer's broadcast (which needs their key).
+#   - gateway mode: the entry point IS SMTP, so verify the gateway's 220 greeting.
+set -o pipefail
+
+{% if local_testing %}
+UPSTREAM="${SMTP_NOTIFICATION_BASE_URL:-https://sink.unitysvc.dev}"
+status=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "${UPSTREAM%/}/" || echo 000)
+# Any non-5xx answer proves the host is up and routing; 401/404 are expected here
+# because this probe deliberately carries no customer credential.
+if [ "$status" -ge 200 ] && [ "$status" -lt 500 ]; then
+    echo "connectivity ok (upstream ${UPSTREAM} returned HTTP ${status})"
+    exit 0
+fi
+echo "connectivity failed: upstream ${UPSTREAM} unreachable (HTTP ${status})" >&2
+exit 1
+{% else %}
+USE_TLS=false
+URL="{{ service_base_url }}"
+if [[ "$URL" == smtps://* ]]; then
+    USE_TLS=true
+    stripped="${URL#smtps://}"
+else
+    stripped="${URL#smtp://}"
+fi
+# Bare host[:port] authority — drop any "/path" and trailing "@<channel>".
+stripped="${stripped%%/*}"
+stripped="${stripped%%@*}"
+HOST="${stripped%%:*}"
+PORT="${stripped#*:}"
+[ "$PORT" = "$HOST" ] && PORT=587
+PORT="${PORT:-587}"
+
+if [ "$USE_TLS" = "true" ]; then
+    greeting=$( (echo "QUIT"; sleep 1) | openssl s_client -connect "$HOST:$PORT" -quiet 2>/dev/null | head -1 )
+else
+    greeting=$( (echo "QUIT"; sleep 1) | nc -w 5 "$HOST" "$PORT" 2>/dev/null | head -1 )
+fi
+if [[ "$greeting" == "220 "* ]]; then
+    echo "connectivity ok ($greeting)"
+    exit 0
+fi
+echo "connectivity failed: expected '220 ...' greeting from ${HOST}:${PORT}, got: ${greeting:-<no response>}" >&2
+exit 1
+{% endif %}

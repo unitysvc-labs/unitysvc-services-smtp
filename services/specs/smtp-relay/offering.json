@@ -2,17 +2,22 @@
   "capabilities": [
     "smtp_relay"
   ],
-  "description": "Point any app or device that already speaks SMTP at the gateway and relay through a server you control \u2014 the platform authenticates each call with your UnitySVC API key (used as the SMTP password) and forwards it to your upstream, without ever storing your messages.\n\nMulti-channel: the free `byok` channel relays every call to one SMTP server you store once as customer secrets, while the metered `plus` channel runs many relays under a single account \u2014 each enrollment binds its own host/port/username plus a named password secret and is reached at a unique `/e/<code>` address. See \u201cHow to use this service\u201d for both channels.",
+  "description": "Point any app or device that already speaks SMTP at the gateway and relay through a server you control — the platform authenticates each call with your UnitySVC API key (used as the SMTP password) and forwards it to your upstream, without ever storing your messages.\n\nMulti-channel: the free `byok` channel relays every call to one SMTP server you store once as customer secrets, while the metered `plus` channel runs many relays under a single account — each enrollment binds its own host/port/username plus a named password secret and is reached at a unique `/e/<code>` address. See “How to use this service” for both channels.",
+  "details": {
+    "input_formats": [
+      "smtp"
+    ]
+  },
   "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
   "name": "smtp-relay",
   "payout_price": {
-    "description": "No platform commission \u2014 customer uses own SMTP",
+    "description": "No platform commission — customer uses own SMTP",
     "percentage": "100.00",
     "type": "revenue_share"
   },
   "service_type": "email",
   "status": "ready",
-  "summary": "Bring Your Own Key SMTP relay: send email through the UnitySVC gateway via your own mail server (Gmail, SES, SendGrid, \u2026). You bring the key; the platform handles auth, routing, and metering.",
+  "summary": "Bring Your Own Key SMTP relay: send email through the UnitySVC gateway via your own mail server (Gmail, SES, SendGrid, …). You bring the key; the platform handles auth, routing, and metering.",
   "tags": [
     "byok",
     "email",

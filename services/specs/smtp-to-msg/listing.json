@@ -14,7 +14,7 @@
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "How the SMTP-to-Message bridge works and the two ways to use it \u2014 a stored receiver (free) or per-enrollment receivers (metered)",
+      "description": "How the SMTP-to-Message bridge works and the two ways to use it — a stored receiver (free) or per-enrollment receivers (metered)",
       "file_path": "usage.md",
       "is_active": true,
       "is_public": true,
@@ -46,7 +46,7 @@
   "list_price": {
     "channels": {
       "byok": {
-        "description": "Free \u2014 customer provides own HTTP receiver",
+        "description": "Free — customer provides own HTTP receiver",
         "price": "0",
         "type": "constant"
       },

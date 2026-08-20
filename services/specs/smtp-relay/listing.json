@@ -7,7 +7,7 @@
     },
     "How to use this service": {
       "category": "getting_started",
-      "description": "How SMTP Relay works and the two ways to use it \u2014 a stored SMTP server (free) or per-enrollment SMTP servers (metered)",
+      "description": "How SMTP Relay works and the two ways to use it — a stored SMTP server (free) or per-enrollment SMTP servers (metered)",
       "file_path": "byok-description.md",
       "is_active": true,
       "is_public": true,
@@ -20,7 +20,7 @@
   "list_price": {
     "channels": {
       "byok": {
-        "description": "Free \u2014 customer provides own SMTP server",
+        "description": "Free — customer provides own SMTP server",
         "price": "0",
         "type": "constant"
       },
@@ -65,12 +65,12 @@
     "properties": {
       "host": {
         "default": "mailpit.unitysvc.dev",
-        "description": "SMTP host (default: mailpit.unitysvc.dev \u2014 the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
+        "description": "SMTP host (default: mailpit.unitysvc.dev — the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
         "type": "string"
       },
       "password_secret": {
         "default": "SMTP_RELAY_PASSWORD",
-        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Defaults to `SMTP_RELAY_PASSWORD` \u2014 the name the free `byok` channel uses \u2014 so empty-params enrollments share the seller-seeded testing secret. Override to a per-enrollment name to bind a different key.",
+        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Defaults to `SMTP_RELAY_PASSWORD` — the name the free `byok` channel uses — so empty-params enrollments share the seller-seeded testing secret. Override to a per-enrollment name to bind a different key.",
         "type": "string"
       },
       "port": {

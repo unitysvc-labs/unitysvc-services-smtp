@@ -8,7 +8,7 @@
       "smtp"
     ]
   },
-  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Inbox/SVG/ic_fluent_mail_inbox_32_color.svg",
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail/SVG/ic_fluent_mail_32_color.svg",
   "name": "smtp-to-mailbox",
   "payout_price": {
     "description": "No platform commission - uses UnitySVC-managed mailbox delivery",

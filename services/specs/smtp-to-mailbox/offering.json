@@ -1,0 +1,39 @@
+{
+  "capabilities": [
+    "email"
+  ],
+  "description": "Send a normal SMTP message to UnitySVC and have it delivered to your verified primary email address.\n\nThe SMTP gateway authenticates each send with your UnitySVC API key, resolves the caller's `__PRIMARY_EMAIL` customer secret, and relays the message through UnitySVC's managed svcpass.com SMTP upstream. The recipient is pinned by service configuration, so the sender's envelope recipient cannot turn this into an open relay.\n\nThere is nothing to enroll or configure: authenticate to the SMTP gateway with username `smtp-to-mailbox` and your UnitySVC API key as the password, then send a normal email. Users without `__PRIMARY_EMAIL` fail closed.",
+  "details": {
+    "input_formats": [
+      "smtp"
+    ]
+  },
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Inbox/SVG/ic_fluent_mail_inbox_32_color.svg",
+  "name": "smtp-to-mailbox",
+  "payout_price": {
+    "description": "No platform commission - uses UnitySVC-managed mailbox delivery",
+    "percentage": "100.00",
+    "type": "revenue_share"
+  },
+  "service_type": "email",
+  "status": "ready",
+  "summary": "Email in, verified mailbox out: send a message to the SMTP gateway and UnitySVC delivers it to your primary email address with no setup.",
+  "tags": [
+    "email",
+    "mailbox",
+    "platform",
+    "smtp"
+  ],
+  "time_created": "2026-08-21T00:00:00Z",
+  "upstream_access_config": {
+    "default": {
+      "access_method": "smtp",
+      "host": "${ secrets.SVCPASS_SMTP_SERVER }",
+      "password": "${ secrets.SVCPASS_SMTP_PASSWORD }",
+      "port": "${ secrets.SVCPASS_SMTP_PORT ?? 587 }",
+      "tls": "${ secrets.SVCPASS_SMTP_TLS ?? true }",
+      "to": "${ customer_secrets.__PRIMARY_EMAIL }",
+      "username": "${ secrets.SVCPASS_SMTP_USERNAME }"
+    }
+  }
+}

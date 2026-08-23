@@ -1,6 +1,6 @@
 {
   "capabilities": [
-    "smtp_relay"
+    "smtp-relay"
   ],
   "description": "Point any app or device that already speaks SMTP at the gateway and relay through a server you control — the platform authenticates each call with your UnitySVC API key (used as the SMTP password) and forwards it to your upstream, without ever storing your messages.\n\nMulti-channel: the free `byok` channel relays every call to one SMTP server you store once as customer secrets, while the metered `plus` channel runs many relays under a single account — each enrollment binds its own host/port/username plus a named password secret and is reached at a unique `/e/<code>` address. See “How to use this service” for both channels.",
   "details": {
@@ -15,7 +15,7 @@
     "percentage": "100.00",
     "type": "revenue_share"
   },
-  "service_type": "email",
+  "service_type": "proxy",
   "status": "ready",
   "summary": "Bring Your Own Key SMTP relay: send email through the UnitySVC gateway via your own mail server (Gmail, SES, SendGrid, …). You bring the key; the platform handles auth, routing, and metering.",
   "tags": [

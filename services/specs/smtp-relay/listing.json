@@ -20,12 +20,12 @@
   "list_price": {
     "channels": {
       "byok": {
-        "description": "Free — customer provides own SMTP server",
+        "description": "Free | customer provides own SMTP server",
         "price": "0",
         "type": "constant"
       },
       "plus": {
-        "description": "$1 per 1,000 emails (1,000 emails per dollar)",
+        "description": "$1 per 1,000 emails | 1,000 emails per dollar",
         "price": "0.001",
         "type": "constant"
       }

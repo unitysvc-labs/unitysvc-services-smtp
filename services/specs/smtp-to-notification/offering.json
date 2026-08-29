@@ -21,13 +21,6 @@
   "service_type": "notification",
   "status": "ready",
   "summary": "Email in, notifications out: send a message to the gateway and it fans out through your own /b/notification group — no enrollment, no receiver, no configuration.",
-  "tags": [
-    "broadcast",
-    "email",
-    "notification",
-    "platform",
-    "smtp"
-  ],
   "time_created": "2026-08-20T00:00:00Z",
   "upstream_access_config": {
     "default": {

@@ -21,13 +21,6 @@
   "service_type": "proxy",
   "status": "ready",
   "summary": "Turn inbound email into compact HTTP notification payloads delivered to an endpoint you control.",
-  "tags": [
-    "email",
-    "enrollment",
-    "http",
-    "notification",
-    "smtp"
-  ],
   "time_created": "2026-06-04T00:00:00Z",
   "upstream_access_config": {
     "byok": {

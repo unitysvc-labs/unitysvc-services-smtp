@@ -18,12 +18,6 @@
   "service_type": "proxy",
   "status": "ready",
   "summary": "Bring Your Own Key SMTP relay: send email through the UnitySVC gateway via your own mail server (Gmail, SES, SendGrid, …). You bring the key; the platform handles auth, routing, and metering.",
-  "tags": [
-    "byok",
-    "email",
-    "enrollment",
-    "smtp"
-  ],
   "time_created": "2026-03-27T00:00:00Z",
   "upstream_access_config": {
     "byok": {

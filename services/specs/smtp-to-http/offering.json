@@ -21,14 +21,6 @@
   "service_type": "proxy",
   "status": "ready",
   "summary": "SMTP-to-HTTP bridge: receive email through the UnitySVC SMTP gateway and forward the full, lossless email envelope as an HTTP POST to your own endpoint — no SDK required.",
-  "tags": [
-    "email",
-    "enrollment",
-    "http",
-    "notification",
-    "smtp",
-    "webhook"
-  ],
   "time_created": "2026-06-04T00:00:00Z",
   "upstream_access_config": {
     "byok": {

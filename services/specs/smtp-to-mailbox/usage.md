@@ -5,9 +5,10 @@ your account. There is nothing to enroll and nothing to configure.
 
 ## Prerequisite: primary email
 
-This service delivers to your `__PRIMARY_EMAIL` customer secret. UnitySVC sets
-that secret from your verified account email. If it is missing, delivery fails
-closed instead of accepting mail with an unknown destination.
+This service delivers to the primary email address on your UnitySVC account.
+Set (and verify) it under **Settings → Account** before using this service —
+until then, this service is not usable: delivery fails closed instead of
+accepting mail with an unknown destination.
 
 ## Sending
 
@@ -29,8 +30,9 @@ swaks --server "$SMTP_GATEWAY_HOST" \
 ```
 
 The gateway uses the `--to` address to accept a normal SMTP transaction, but the
-upstream recipient is pinned to your `__PRIMARY_EMAIL`. Changing the envelope or
-message recipient does not route mail to a different external address.
+upstream recipient is pinned to your account's primary email. Changing the
+envelope or message recipient does not route mail to a different external
+address.
 
 ## What gets delivered
 

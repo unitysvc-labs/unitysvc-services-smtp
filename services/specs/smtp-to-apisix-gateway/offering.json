@@ -2,7 +2,7 @@
   "capabilities": [
     "smtp-to-http"
   ],
-  "description": "A regular SMTP-to-HTTP bridge (same shape as `smtp-to-http`/`smtp-to-msg`) whose receiver is set via `customer_secrets.SMTP_APISIX_GATEWAY_BASE_URL` to the platform's own API gateway route for `http-to-sink`, which forwards on to the sink test receiver. Exists purely as infrastructure for the post-deploy gateway smoke test (unitysvc-k8s gateway-smoke workflow): it proves the SMTP gateway can reach the API gateway end to end — SMTP gateway -> API gateway (`http-to-sink`) -> sink -- verifiable by polling sink's own `/retrieve` API. A literal, fully-resolved URL is used (not the `${API_GATEWAY_BASE_URL}` placeholder) since that placeholder is only known to be substituted for worker-rendered test documents, not for a live offering's upstream_access_config at real dispatch time. Not intended for real relay use.",
+  "description": "A regular SMTP-to-HTTP bridge (same shape as `smtp-to-notification`/`smtp-to-msg`) whose receiver is the platform's own API gateway route for `http-to-sink`, which forwards on to the sink test receiver. Exists purely as infrastructure for the post-deploy gateway smoke test (unitysvc-k8s gateway-smoke workflow): it proves the SMTP gateway can reach the API gateway end to end — SMTP gateway -> API gateway (`http-to-sink`) -> sink -- verifiable by polling sink's own `/retrieve` API. Uses `auth_mode: forward` (the SMTP gateway's own mechanism, see plugins/lib/email_to_http.js in smtp-gateway — replays the caller's own svcpass as a Bearer token) rather than the API-gateway-side `api_key: __forward__` disposition, which requires a statically-resolvable literal host and would reject the `${API_GATEWAY_BASE_URL}` placeholder needed for this to work correctly on both staging and production. Not intended for real relay use.",
   "details": {
     "input_formats": [
       "smtp"
@@ -25,7 +25,7 @@
   "upstream_access_config": {
     "default": {
       "access_method": "http",
-      "api_key": "${ customer_secrets.OPS_SMTP_APISIX_API_KEY ?? svcpass_opstest000000000customer000000000000000000000000728d }",
+      "auth_mode": "forward",
       "base_url": "${API_GATEWAY_BASE_URL}/http-to-sink",
       "is_active": true,
       "is_primary": true,

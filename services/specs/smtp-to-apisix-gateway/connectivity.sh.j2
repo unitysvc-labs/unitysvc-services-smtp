@@ -31,17 +31,17 @@ esac
 {% else %}
 # Gateway mode: submit over SMTP so the whole chain runs — SMTP gateway ->
 # API gateway (http-to-sink) -> sink. The caller's own svcpass credential
-# (SMTP AUTH password) is forwarded by the offering's api_key=__forward__.
-curl --silent --show-error --ssl --url "{{ service_base_url }}" \
-  --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
-  --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
-  --upload-file - <<EMAIL
-From: test@example.com
-To: recipient@example.com
-Subject: ${SUBJECT}
-
-hello from smtp-to-apisix-gateway
-EMAIL
+# (SMTP AUTH password) is forwarded by the offering's auth_mode=forward.
+#
+# curl does not translate line endings for an SMTP upload — a plain heredoc
+# here would emit bare-LF-terminated lines, which Haraka's SMTP-smuggling
+# hardening rejects outright (451 Bare line-feed). Build the message with
+# explicit CRLF instead.
+printf 'From: test@example.com\r\nTo: recipient@example.com\r\nSubject: %s\r\n\r\nhello from smtp-to-apisix-gateway\r\n' "${SUBJECT}" \
+  | curl --silent --show-error --ssl --url "{{ service_base_url }}" \
+    --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
+    --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
+    --upload-file -
 {% endif %}
 
 if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then

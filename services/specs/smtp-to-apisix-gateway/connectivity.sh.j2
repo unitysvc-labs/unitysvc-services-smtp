@@ -1,0 +1,52 @@
+#!/bin/bash
+# Deep connectivity test for smtp-to-apisix-gateway: the point of this
+# service is to prove the SMTP gateway can reach the API gateway, so a
+# shallow "did SMTP answer 220" check would miss exactly the failure this
+# service exists to catch. Instead: submit a message with a unique marker,
+# then poll the sink's own /retrieve API to confirm the request actually
+# made it through both hops (SMTP gateway -> API gateway -> sink).
+set -o pipefail
+
+SINK="https://sink.unitysvc.dev"
+MARKER="smtp2apisix-$(date +%s)-${RANDOM}"
+SUBJECT="smtp-to-apisix-gateway e2e ${MARKER}"
+
+{% if local_testing %}
+# Local mode has no SMTP session to submit through, so this isolates the
+# second hop only: an authenticated HTTP client reaching http-to-sink
+# through the API gateway (skips the SMTP -> API gateway hop by design).
+URL="{{ service_base_url }}"
+status=$(curl -sS --max-time 10 \
+    -H "Authorization: Bearer ${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY}" \
+    -H 'Content-Type: application/json' \
+    -o /dev/null -w '%{http_code}' \
+    -X POST "$URL" --data "{\"marker\":\"${MARKER}\"}" 2>/dev/null || echo 000)
+case "$status" in
+  2??|3??) ;;
+  *)
+    echo "connectivity failed: HTTP $status posting to $URL" >&2
+    exit 1
+    ;;
+esac
+{% else %}
+# Gateway mode: submit over SMTP so the whole chain runs — SMTP gateway ->
+# API gateway (http-to-sink) -> sink. The caller's own svcpass credential
+# (SMTP AUTH password) is forwarded by the offering's api_key=__forward__.
+curl --silent --show-error --ssl --url "{{ service_base_url }}" \
+  --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
+  --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
+  --upload-file - <<EMAIL
+From: test@example.com
+To: recipient@example.com
+Subject: ${SUBJECT}
+
+hello from smtp-to-apisix-gateway
+EMAIL
+{% endif %}
+
+if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then
+    echo "connectivity ok — sink recorded the forwarded request (${MARKER})"
+    exit 0
+fi
+echo "connectivity failed: ${MARKER} never reached ${SINK}" >&2
+exit 1

@@ -1,0 +1,35 @@
+{
+  "capabilities": [
+    "smtp-to-http"
+  ],
+  "description": "A regular SMTP-to-HTTP bridge (same shape as `smtp-to-notification`/`smtp-to-msg`) whose receiver is the platform's own API gateway route for `http-to-sink`, which forwards on to the sink test receiver. Exists purely as infrastructure for the post-deploy gateway smoke test (unitysvc-k8s gateway-smoke workflow): it proves the SMTP gateway can reach the API gateway end to end — SMTP gateway -> API gateway (`http-to-sink`) -> sink -- verifiable by polling sink's own `/retrieve` API. Uses `auth_mode: forward` (the SMTP gateway's own mechanism, see plugins/lib/email_to_http.js in smtp-gateway — replays the caller's own svcpass as a Bearer token) rather than the API-gateway-side `api_key: __forward__` disposition, which requires a statically-resolvable literal host and would reject the `${API_GATEWAY_BASE_URL}` placeholder needed for this to work correctly on both staging and production. Not intended for real relay use.",
+  "details": {
+    "input_formats": [
+      "smtp"
+    ],
+    "output_formats": [
+      "msg"
+    ]
+  },
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
+  "name": "smtp-to-apisix-gateway",
+  "payout_price": {
+    "description": "Free — internal smoke-test infrastructure",
+    "percentage": "0.00",
+    "type": "revenue_share"
+  },
+  "service_type": "proxy",
+  "status": "ready",
+  "summary": "Gateway smoke-test only: SMTP gateway -> API gateway (http-to-sink) -> sink, fixed and unauthenticated except for the forwarded caller credential.",
+  "time_created": "2026-09-06T00:00:00Z",
+  "upstream_access_config": {
+    "default": {
+      "access_method": "http",
+      "auth_mode": "forward",
+      "base_url": "${API_GATEWAY_BASE_URL}/http-to-sink",
+      "is_active": true,
+      "is_primary": true,
+      "payload_format": "apprise"
+    }
+  }
+}

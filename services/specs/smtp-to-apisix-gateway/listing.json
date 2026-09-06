@@ -1,0 +1,36 @@
+{
+  "currency": "USD",
+  "display_name": "SMTP-to-APISIX-Gateway Smoke Test",
+  "documents": {
+    "Connectivity test": {
+      "category": "connectivity_test",
+      "file_path": "connectivity.sh.j2",
+      "is_active": true,
+      "is_public": false,
+      "meta": {
+        "output_contains": "connectivity ok"
+      },
+      "mime_type": "bash"
+    }
+  },
+  "list_price": {
+    "description": "Free — internal smoke-test infrastructure",
+    "price": "0",
+    "type": "constant"
+  },
+  "name": "smtp-to-apisix-gateway",
+  "service_options": {
+    "default_visibility": "private"
+  },
+  "status": "ready",
+  "time_created": "2026-09-06T00:00:00Z",
+  "user_access_interfaces": {
+    "smtp_gateway": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "smtp-to-apisix-gateway"
+      }
+    }
+  }
+}

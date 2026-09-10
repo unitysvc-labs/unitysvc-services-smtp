@@ -1,0 +1,63 @@
+#!/bin/bash
+# Deep connectivity test for smtp-to-api-gateway: the point of this service is
+# to forward an email into a route on the API gateway, so a shallow "did SMTP
+# answer 220" check would miss exactly the failure that matters. Instead:
+# submit a message carrying a unique marker, then poll the sink's own /retrieve
+# API to confirm the request made it through both hops
+# (SMTP gateway -> API gateway route -> sink).
+#
+# Under test the target route is http-to-sink (ops_testing_parameters for the
+# plus channel; the SMTP_TO_API_GATEWAY_TARGET seller secret for the default
+# channel), which forwards to the platform sink receiver.
+set -o pipefail
+
+SINK="https://sink.unitysvc.dev"
+MARKER="smtp2api-$(date +%s)-${RANDOM}"
+SUBJECT="smtp-to-api-gateway e2e ${MARKER}"
+
+{% if local_testing %}
+# Local (upstream) mode has no SMTP session to submit through and no customer
+# credential — the runner supplies only SERVICE_BASE_URL, and this service's
+# upstream carries no api_key (auth_mode: forward replays the caller's own).
+# It also passes SERVICE_BASE_URL through with ${API_GATEWAY_BASE_URL} still
+# literal: the backend substitutes that macro only for user_access_interfaces,
+# never for upstream_access_config, so the gateway is normally what expands it.
+# Default it here so the shell can, then probe unauthenticated: any non-5xx
+# proves the API Gateway host is up and routing this path (401 is the expected
+# answer without a key). End-to-end delivery is the gateway-mode branch's job.
+: "${API_GATEWAY_BASE_URL:=https://api.svcpass.com}"
+URL="{{ service_base_url }}"
+status=$(curl -sS --max-time 10 \
+    -H 'Content-Type: application/json' \
+    -o /dev/null -w '%{http_code}' \
+    -X POST "$URL" --data "{\"title\":\"${SUBJECT}\",\"body\":\"${MARKER}\",\"type\":\"info\",\"format\":\"text\"}" 2>/dev/null || echo 000)
+case "$status" in
+  5??|000|"")
+    echo "connectivity failed: HTTP ${status:-000} posting to $URL" >&2
+    exit 1
+    ;;
+esac
+echo "connectivity ok (API Gateway answered HTTP ${status} for ${URL})"
+exit 0
+{% else %}
+# Gateway mode: submit over SMTP so the whole chain runs — SMTP gateway ->
+# API gateway (target route) -> sink. The caller's own svcpass credential
+# (SMTP AUTH password) is forwarded by the offering's auth_mode=forward.
+#
+# curl does not translate line endings for an SMTP upload — a plain heredoc
+# here would emit bare-LF-terminated lines, which Haraka's SMTP-smuggling
+# hardening rejects outright (451 Bare line-feed). Build the message with
+# explicit CRLF instead.
+printf 'From: test@example.com\r\nTo: recipient@example.com\r\nSubject: %s\r\n\r\nhello from smtp-to-api-gateway\r\n' "${SUBJECT}" \
+  | curl --silent --show-error --ssl --url "{{ service_base_url }}" \
+    --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
+    --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
+    --upload-file -
+{% endif %}
+
+if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then
+    echo "connectivity ok — sink recorded the forwarded request (${MARKER})"
+    exit 0
+fi
+echo "connectivity failed: ${MARKER} never reached ${SINK}" >&2
+exit 1

@@ -1,0 +1,44 @@
+{
+  "capabilities": [
+    "smtp-to-http"
+  ],
+  "description": "Send an email and have it delivered to any route on the UnitySVC API Gateway — a service, an alias, a broadcast group, or an enrollment — as your own identity.\n\nThe SMTP gateway accepts the message, authenticates it with your UnitySVC API key (used as the SMTP password), converts it to the payload format you chose — the faithful `email` envelope (sender, recipients, subject, both body parts, headers, attachments) or the compact `{title, body, type, format}` `apprise` envelope — and POSTs it to `${API_GATEWAY_BASE_URL}/<target>` with your own API key replayed as the bearer token. The host is fixed to the platform's API Gateway; you choose only the route, so the forwarded credential never leaves UnitySVC. Whatever the target route bills, it bills under its own listing; this ingress hop is free on the default channel and metered on the `plus` channel.\n\nUse the free `default` channel to forward every message to one route stored as the `SMTP_TO_API_GATEWAY_TARGET` customer secret (default `notify`, which delivers to your configured notification destination) in the format stored as `SMTP_TO_API_GATEWAY_FORMAT` (default `apprise`). Use the metered `plus` channel to run many email-to-route bridges under one account: each enrollment binds its own `target` and `payload_format`, uses a unique SMTP username, and is billed at $1 per 1,000 emails. See “How to use this service” for setup and examples.",
+  "details": {
+    "input_formats": [
+      "smtp"
+    ],
+    "output_formats": [
+      "msg",
+      "x-email-envelope"
+    ]
+  },
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
+  "name": "smtp-to-api-gateway",
+  "payout_price": {
+    "description": "No platform commission — forwards into the customer's own API Gateway route",
+    "percentage": "100.00",
+    "type": "revenue_share"
+  },
+  "service_type": "proxy",
+  "status": "ready",
+  "summary": "Email in, API Gateway route out: send a message to the SMTP gateway and it is forwarded, as a faithful email envelope or a compact notification, to any UnitySVC route you choose, as you.",
+  "time_created": "2026-08-20T00:00:00Z",
+  "upstream_access_config": {
+    "default": {
+      "access_method": "http",
+      "auth_mode": "forward",
+      "base_url": "${API_GATEWAY_BASE_URL}/${ customer_secrets.SMTP_TO_API_GATEWAY_TARGET ?? notify }",
+      "is_active": true,
+      "is_primary": true,
+      "payload_format": "${ customer_secrets.SMTP_TO_API_GATEWAY_FORMAT ?? apprise }"
+    },
+    "plus": {
+      "access_method": "http",
+      "auth_mode": "forward",
+      "base_url": "${API_GATEWAY_BASE_URL}/{{ params.target }}",
+      "is_active": true,
+      "is_primary": true,
+      "payload_format": "{{ params.payload_format }}"
+    }
+  }
+}

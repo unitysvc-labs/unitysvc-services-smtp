@@ -28,11 +28,14 @@ SMTP-to-Message bridge — forwards inbound email to your HTTP endpoint as the s
 `{title, body, type, format}` Apprise notification envelope. `byok`: one receiver via
 `SMTP_HTTP_RELAY_BASE_URL`. `plus`: many Apprise receivers, one per enrollment.
 
-### smtp-to-notification
+### smtp-to-api-gateway
 
-SMTP-to-Notification bridge — forwards inbound email to the caller's own
-`/b/notification` broadcast group. No enrollment or per-service configuration is
-required.
+SMTP-to-API-Gateway bridge — forwards inbound email into a route on the UnitySVC
+API Gateway (a service, `a/<alias>`, `b/<group>`, `e/<code>`) as the caller's own
+identity, as either the faithful `email` envelope or the compact `apprise`
+envelope. `default`: one route via `SMTP_TO_API_GATEWAY_TARGET` /
+`SMTP_TO_API_GATEWAY_FORMAT` (defaults `notify` / `apprise`, so it works with no
+configuration). `plus`: many routes, one per enrollment.
 
 ### smtp-to-mailbox
 

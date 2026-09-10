@@ -1,0 +1,99 @@
+{
+  "currency": "USD",
+  "display_name": "SMTP-to-API-Gateway Bridge",
+  "documents": {
+    "Connectivity test": {
+      "category": "connectivity_test",
+      "file_path": "connectivity.sh.j2",
+      "is_active": true,
+      "is_public": false,
+      "meta": {
+        "output_contains": "connectivity ok",
+        "timeout": 90
+      },
+      "mime_type": "bash"
+    },
+    "How to use this service": {
+      "category": "getting_started",
+      "description": "How the SMTP-to-API-Gateway bridge works and the two ways to use it — a stored route (free) or per-enrollment routes (metered)",
+      "file_path": "usage.md",
+      "is_active": true,
+      "is_public": true,
+      "mime_type": "markdown"
+    },
+    "Shell code example": {
+      "category": "code_example",
+      "description": "Send an email through the gateway with curl and confirm it reached the target route",
+      "file_path": "code-example.sh.j2",
+      "is_active": true,
+      "is_public": true,
+      "meta": {
+        "timeout": 90
+      },
+      "mime_type": "bash"
+    }
+  },
+  "list_price": {
+    "channels": {
+      "default": {
+        "description": "Free | one API Gateway route stored as a customer secret",
+        "price": "0",
+        "type": "constant"
+      },
+      "plus": {
+        "description": "$1 per 1,000 emails | 1,000 emails per dollar",
+        "price": "0.001",
+        "type": "constant"
+      }
+    },
+    "default": "default",
+    "type": "channel"
+  },
+  "name": "smtp-to-api-gateway",
+  "service_options": {
+    "ops_testing_parameters": {
+      "payload_format": "apprise",
+      "target": "http-to-sink"
+    }
+  },
+  "status": "ready",
+  "time_created": "2026-08-20T00:00:00Z",
+  "user_access_interfaces": {
+    "enrollment": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "{{ enrollment.code }}"
+      }
+    },
+    "smtp_gateway": {
+      "access_method": "smtp",
+      "base_url": "${SMTP_GATEWAY_BASE_URL}",
+      "routing_key": {
+        "username": "smtp-to-api-gateway"
+      }
+    }
+  },
+  "user_parameters_schema": {
+    "properties": {
+      "payload_format": {
+        "default": "email",
+        "description": "Body shape POSTed to the target route: `email` (faithful envelope — sender, recipients, subject, text and html bodies, headers, attachments) or `apprise` (compact `{title, body, type, format}` notification envelope, what `notify` and the `msg-to-*` services accept).",
+        "enum": [
+          "email",
+          "apprise"
+        ],
+        "type": "string"
+      },
+      "target": {
+        "description": "Route on the UnitySVC API Gateway to forward to, relative to the gateway host — a service name (`notify`, `msg-to-discord`), an alias (`a/alerts`), a broadcast group (`b/relay`), or an enrollment (`e/XXXXXX`). No scheme, no leading slash.",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._@-]*(/[A-Za-z0-9][A-Za-z0-9._@-]*)*$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "target"
+    ],
+    "type": "object"
+  }
+}

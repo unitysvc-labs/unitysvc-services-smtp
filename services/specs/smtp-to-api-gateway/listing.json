@@ -21,6 +21,17 @@
       "is_public": true,
       "mime_type": "markdown"
     },
+    "Python code example": {
+      "category": "code_example",
+      "description": "Send an email through the gateway with smtplib and confirm it reached the target route",
+      "file_path": "code-example.py.j2",
+      "is_active": true,
+      "is_public": true,
+      "meta": {
+        "timeout": 90
+      },
+      "mime_type": "python"
+    },
     "Shell code example": {
       "category": "code_example",
       "description": "Send an email through the gateway with curl and confirm it reached the target route",

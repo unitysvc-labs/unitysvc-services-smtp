@@ -16,22 +16,29 @@ MARKER="smtp2api-$(date +%s)-${RANDOM}"
 SUBJECT="smtp-to-api-gateway e2e ${MARKER}"
 
 {% if local_testing %}
-# Local mode has no SMTP session to submit through, so this isolates the
-# second hop only: an authenticated HTTP client reaching the target route
-# through the API gateway (skips the SMTP -> API gateway hop by design).
+# Local (upstream) mode has no SMTP session to submit through and no customer
+# credential — the runner supplies only SERVICE_BASE_URL, and this service's
+# upstream carries no api_key (auth_mode: forward replays the caller's own).
+# It also passes SERVICE_BASE_URL through with ${API_GATEWAY_BASE_URL} still
+# literal: the backend substitutes that macro only for user_access_interfaces,
+# never for upstream_access_config, so the gateway is normally what expands it.
+# Default it here so the shell can, then probe unauthenticated: any non-5xx
+# proves the API Gateway host is up and routing this path (401 is the expected
+# answer without a key). End-to-end delivery is the gateway-mode branch's job.
+: "${API_GATEWAY_BASE_URL:=https://api.svcpass.com}"
 URL="{{ service_base_url }}"
 status=$(curl -sS --max-time 10 \
-    -H "Authorization: Bearer ${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY}" \
     -H 'Content-Type: application/json' \
     -o /dev/null -w '%{http_code}' \
     -X POST "$URL" --data "{\"title\":\"${SUBJECT}\",\"body\":\"${MARKER}\",\"type\":\"info\",\"format\":\"text\"}" 2>/dev/null || echo 000)
 case "$status" in
-  2??|3??) ;;
-  *)
-    echo "connectivity failed: HTTP $status posting to $URL" >&2
+  5??|000|"")
+    echo "connectivity failed: HTTP ${status:-000} posting to $URL" >&2
     exit 1
     ;;
 esac
+echo "connectivity ok (API Gateway answered HTTP ${status} for ${URL})"
+exit 0
 {% else %}
 # Gateway mode: submit over SMTP so the whole chain runs — SMTP gateway ->
 # API gateway (target route) -> sink. The caller's own svcpass credential

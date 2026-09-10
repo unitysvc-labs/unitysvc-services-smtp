@@ -15,13 +15,22 @@ MARKER="smtp2api-$(date +%s)-${RANDOM}"
 SUBJECT="smtp-to-api-gateway example ${MARKER}"
 
 {% if local_testing %}
-# Upstream test: POST the envelope straight to the target route on the API
-# gateway (the hop the SMTP gateway performs on your behalf).
-status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "{{ service_base_url }}" \
-  -H "Authorization: Bearer ${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
+# Upstream mode: probe the target route on the API gateway — the hop the SMTP
+# gateway performs on your behalf. No customer credential is available here
+# (this service's upstream carries none; auth_mode: forward replays the
+# caller's own), and SERVICE_BASE_URL still holds the literal
+# ${API_GATEWAY_BASE_URL} macro, which only the gateway expands — so default
+# the host and accept any non-5xx: 401 is the expected unauthenticated answer.
+: "${API_GATEWAY_BASE_URL:=https://api.svcpass.com}"
+URL="{{ service_base_url }}"
+status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$URL" \
   -H 'Content-Type: application/json' \
-  --data "{\"title\":\"${SUBJECT}\",\"body\":\"hello from smtp-to-api-gateway\",\"type\":\"info\",\"format\":\"text\"}")
-[ "$status" -ge 200 ] && [ "$status" -lt 300 ] || { echo "route returned HTTP $status" >&2; exit 1; }
+  --data "{\"title\":\"${SUBJECT}\",\"body\":\"hello from smtp-to-api-gateway\",\"type\":\"info\",\"format\":\"text\"}" 2>/dev/null || echo 000)
+case "$status" in
+  5??|000|"") echo "route ${URL} unreachable (HTTP ${status:-000})" >&2; exit 1 ;;
+esac
+echo "route ${URL} reachable (HTTP ${status}) — send end to end with the gateway example below"
+exit 0
 {% else %}
 # Gateway send: submit the email over SMTP. Username selects the bridge (the
 # service name, or an enrollment code on the plus channel); password is your

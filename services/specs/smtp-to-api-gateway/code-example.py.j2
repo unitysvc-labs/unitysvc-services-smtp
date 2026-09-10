@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""smtp-to-api-gateway forwards an inbound email into a route on the UnitySVC
+API Gateway, authenticated as you (your svcpass is replayed as the bearer
+token). Which route, and in which payload format, is configuration:
+
+    default channel : SMTP_TO_API_GATEWAY_TARGET / SMTP_TO_API_GATEWAY_FORMAT secrets
+    plus channel    : the enrollment's `target` / `payload_format` parameters
+
+Here the target route is http-to-sink, which forwards to the platform sink
+(sink.unitysvc.dev). The sink records each request, so we CONFIRM delivery end
+to end: send with a unique marker in the subject, then long-poll the sink for a
+recorded request carrying it."""
+import json
+import os
+import time
+import urllib.request
+
+{% if local_testing %}
+import urllib.error
+{% else %}
+import smtplib
+from email.message import EmailMessage
+from urllib.parse import urlparse
+{% endif %}
+
+SINK = "https://sink.unitysvc.dev"  # what the http-to-sink route forwards to
+marker = f"smtp2api-{int(time.time())}-{os.getpid()}"  # unique per run
+subject = f"smtp-to-api-gateway example {marker}"
+
+{% if local_testing %}
+# Upstream mode: probe the target route on the API gateway — the hop the SMTP
+# gateway performs on your behalf. No customer credential is available here
+# (this service's upstream carries none; auth_mode: forward replays the
+# caller's own), and SERVICE_BASE_URL still holds the literal
+# ${API_GATEWAY_BASE_URL} macro, which only the gateway expands — so resolve
+# the host and accept any non-5xx: 401 is the expected unauthenticated answer.
+base = os.environ.get("API_GATEWAY_BASE_URL") or "https://api.svcpass.com"
+url = "{{ service_base_url }}".replace("${API_GATEWAY_BASE_URL}", base)
+payload = {"title": subject, "body": "hello from smtp-to-api-gateway",
+           "type": "info", "format": "text"}
+req = urllib.request.Request(
+    url,
+    data=json.dumps(payload).encode(),
+    method="POST",
+    headers={"Content-Type": "application/json"},
+)
+try:
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        status = resp.status
+except urllib.error.HTTPError as exc:      # 401/404 are expected without a key
+    status = exc.code
+assert status < 500, f"route {url} unreachable (HTTP {status})"
+print(f"route {url} reachable (HTTP {status}) — send end to end with the gateway example below")
+raise SystemExit(0)
+{% else %}
+api_key = os.environ["UNITYSVC_API_KEY"]  # your svcpass key
+# Gateway send: submit the email over SMTP. The username selects the bridge
+# (the service name, or an enrollment code on the plus channel); the password is
+# your svcpass. Any To: address works — routing is by SMTP username, not
+# recipient. The gateway converts the message to the configured payload format
+# and POSTs it to your route as you.
+parsed = urlparse("{{ service_base_url }}")
+msg = EmailMessage()
+msg["From"] = "test@example.com"
+msg["To"] = "recipient@example.com"
+msg["Subject"] = subject
+msg.set_content("hello from smtp-to-api-gateway")
+cls = smtplib.SMTP_SSL if parsed.scheme == "smtps" else smtplib.SMTP
+with cls(parsed.hostname, parsed.port or 587, timeout=10) as server:
+    if parsed.scheme != "smtps":
+        server.ehlo()
+        if server.has_extn("STARTTLS"):
+            server.starttls()
+            server.ehlo()
+    server.login("{{ routing_key.username }}", api_key)
+    server.send_message(msg)
+{% endif %}
+
+# Confirm delivery by querying the receiver behind the route: the sink
+# long-polls up to 30s for a recorded request carrying our marker (the subject,
+# forwarded as the envelope's title).
+with urllib.request.urlopen(f"{SINK}/retrieve?search={marker}&wait=30", timeout=35) as resp:
+    hits = json.loads(resp.read())
+assert hits, f"NOT delivered — no request carrying {marker} reached {SINK}"
+print(f"delivered — sink recorded the forwarded request ({marker})")

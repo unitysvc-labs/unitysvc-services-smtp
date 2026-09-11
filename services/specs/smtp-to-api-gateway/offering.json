@@ -12,7 +12,7 @@
       "x-email-envelope"
     ]
   },
-  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Apps/SVG/ic_fluent_apps_32_color.svg",
   "name": "smtp-to-api-gateway",
   "payout_price": {
     "description": "No platform commission — forwards into the customer's own API Gateway route",

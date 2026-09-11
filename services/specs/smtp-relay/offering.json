@@ -8,7 +8,7 @@
       "smtp"
     ]
   },
-  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Arrow%20Square/SVG/ic_fluent_arrow_square_32_color.svg",
   "name": "smtp-relay",
   "payout_price": {
     "description": "No platform commission — customer uses own SMTP",

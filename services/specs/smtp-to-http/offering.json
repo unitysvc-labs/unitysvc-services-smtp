@@ -11,7 +11,7 @@
       "x-email-envelope"
     ]
   },
-  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Mail%20Multiple/SVG/ic_fluent_mail_multiple_32_color.svg",
+  "logo": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/main/assets/Link/SVG/ic_fluent_link_32_color.svg",
   "name": "smtp-to-http",
   "payout_price": {
     "description": "No platform commission — customer uses own HTTP receiver",

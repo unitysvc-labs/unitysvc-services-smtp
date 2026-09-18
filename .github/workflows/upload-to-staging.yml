@@ -4,9 +4,6 @@ name: Upload Data to Staging
 # once for all unitysvc-services-* repos. See unitysvc-labs/.github.
 
 on:
-  pull_request:
-    types: [closed]
-    branches: [main]
   workflow_dispatch:
 
 jobs:

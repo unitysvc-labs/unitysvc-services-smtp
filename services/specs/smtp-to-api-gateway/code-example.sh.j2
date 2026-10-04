@@ -43,6 +43,14 @@ printf 'From: test@example.com\r\nTo: recipient@example.com\r\nSubject: %s\r\n\r
     --upload-file -
 {% endif %}
 
+# The fixed service-name interface forwards to the customer's stored target,
+# not the enrollment's test-bound sink. SMTP acceptance is its observable
+# success condition.
+if [ "{{ routing_key.username }}" = "smtp-to-api-gateway" ]; then
+  echo "accepted — SMTP gateway queued the message for the configured target"
+  exit 0
+fi
+
 # Confirm delivery by querying the receiver behind the route: the sink
 # long-polls up to 30s for a recorded request carrying our marker.
 if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then

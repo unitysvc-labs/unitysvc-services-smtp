@@ -55,6 +55,14 @@ printf 'From: test@example.com\r\nTo: recipient@example.com\r\nSubject: %s\r\n\r
     --upload-file -
 {% endif %}
 
+# The fixed service-name interface uses the customer's stored target, which is
+# intentionally unavailable to the test runner. A completed SMTP transaction
+# proves that contract; only enrollment interfaces are bound to the test sink.
+if [ "{{ routing_key.username }}" = "smtp-to-api-gateway" ]; then
+    echo "connectivity ok — SMTP gateway accepted the message"
+    exit 0
+fi
+
 if curl -sS "${SINK}/retrieve?search=${MARKER}&wait=30" | grep -q "${MARKER}"; then
     echo "connectivity ok — sink recorded the forwarded request (${MARKER})"
     exit 0

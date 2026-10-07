@@ -57,6 +57,7 @@
       }
     },
     "default": "default",
+    "description": "Free to $1 per 1,000 emails",
     "type": "channel"
   },
   "name": "smtp-to-api-gateway",

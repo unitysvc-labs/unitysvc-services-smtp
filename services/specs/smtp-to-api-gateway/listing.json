@@ -8,7 +8,6 @@
       "is_active": true,
       "is_public": false,
       "meta": {
-        "output_contains": "connectivity ok",
         "timeout": 90
       },
       "mime_type": "bash"

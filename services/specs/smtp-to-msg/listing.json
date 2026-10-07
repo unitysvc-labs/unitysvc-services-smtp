@@ -7,9 +7,6 @@
       "file_path": "connectivity.sh.j2",
       "is_active": true,
       "is_public": false,
-      "meta": {
-        "output_contains": "connectivity ok"
-      },
       "mime_type": "bash"
     },
     "How to use this service": {
@@ -57,6 +54,7 @@
       }
     },
     "default": "byok",
+    "description": "Free to $1 per 1,000 emails",
     "type": "channel"
   },
   "name": "smtp-to-msg",

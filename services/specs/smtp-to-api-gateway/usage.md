@@ -15,7 +15,7 @@ sequenceDiagram
     participant R as Whatever the route resolves to
 
     S->>G: SMTP AUTH (username = bridge, password = svcpass)<br/>+ email
-    Note over G: Authenticate · convert email to<br/>email or apprise payload
+    Note over G: Authenticate · convert email to<br/>x-email-envelope or msg payload
     G->>A: POST /<target><br/>Authorization: Bearer <your svcpass>
     A->>R: normal gateway dispatch (billed by the route's listing)
     R-->>A: response
@@ -27,10 +27,12 @@ sequenceDiagram
 
 | `payload_format` | Body POSTed to the route | Use it for |
 |---|---|---|
-| `email` | the faithful envelope — `from`, `to`, `subject`, `text_body`, `html_body`, allowlisted `headers`, base64 `attachments`, SPF/DKIM passthrough | routes that need the whole message: `http-to-smtp`, `http-to-smtp-gateway`, archival or parsing services, a `/b/` group whose legs accept `email` |
-| `apprise` | the compact `{title, body, type, format}` envelope — subject → `title`, body → `body` | `notify`, any `msg-to-<channel>` service, a `/b/` group of `msg` legs. Attachments, HTML structure and custom headers are dropped. |
+| `x-email-envelope` | the faithful envelope — `from`, `to`, `subject`, `text_body`, `html_body`, allowlisted `headers`, base64 `attachments`, SPF/DKIM passthrough | routes that need the whole message: `http-to-smtp`, `http-to-smtp-gateway`, archival or parsing services, a `/b/` group whose legs accept `x-email-envelope` |
+| `msg` | the compact `{title, body, type, format}` envelope — subject → `title`, body → `body` | `notify`, any `msg-to-<channel>` service, a `/b/` group of `msg` legs. Attachments, HTML structure and custom headers are dropped. |
 
-Be lossy as late as possible: if the route (or anything behind it) might need the original message, send `email`.
+Be lossy as late as possible: if the route (or anything behind it) might need the original message, send `x-email-envelope`.
+
+The older names `email` and `apprise` are still accepted as aliases for `x-email-envelope` and `msg`.
 
 ## Two ways to use this service
 
@@ -38,7 +40,7 @@ Be lossy as late as possible: if the route (or anything behind it) might need th
 |----------------|--------------------------|--------------------------------|
 | Best for       | one fixed destination    | many email-to-route bridges under one account |
 | Route          | `SMTP_TO_API_GATEWAY_TARGET` customer secret (default `notify`) | a `target` parameter per enrollment |
-| Payload format | `SMTP_TO_API_GATEWAY_FORMAT` customer secret (default `apprise`) | a `payload_format` parameter per enrollment (default `email`) |
+| Payload format | `SMTP_TO_API_GATEWAY_FORMAT` customer secret (default `msg`) | a `payload_format` parameter per enrollment (default `x-email-envelope`) |
 | SMTP username  | `smtp-to-api-gateway`    | the enrollment's 6-character code |
 | Price          | **free**                 | **$0.001 / email** ($1 per 1,000) |
 
@@ -46,10 +48,10 @@ The route's own listing bills whatever it bills in both cases; this bridge only 
 
 ### Method 1 — Stored route (`default`, free)
 
-With **no configuration at all**, the bridge forwards to `notify` as an `apprise` envelope — every email becomes a notification delivered to the destination you configured under Notifications. To point it elsewhere, set customer secrets:
+With **no configuration at all**, the bridge forwards to `notify` as a `msg` envelope — every email becomes a notification delivered to the destination you configured under Notifications. To point it elsewhere, set customer secrets:
 
 - `SMTP_TO_API_GATEWAY_TARGET` — the route, relative to the API Gateway host: `msg-to-discord`, `a/alerts`, `b/relay`, `e/XXXXXX`, …
-- `SMTP_TO_API_GATEWAY_FORMAT` — `email` or `apprise`
+- `SMTP_TO_API_GATEWAY_FORMAT` — `x-email-envelope` or `msg`
 
 Then authenticate to the SMTP gateway and send a normal email:
 
@@ -72,21 +74,21 @@ Any `To:` address works — routing is by SMTP username, not recipient.
 
 ### Method 2 — Per-enrollment routes (`plus`, metered)
 
-Run **multiple** bridges under one account — e.g. `alerts@…` → `notify`, `invoices@…` → an archival `/b/` group as `email`, `leads@…` → a CRM webhook behind `http-relay`. Each enrollment binds:
+Run **multiple** bridges under one account — e.g. `alerts@…` → `notify`, `invoices@…` → an archival `/b/` group as `x-email-envelope`, `leads@…` → a CRM webhook behind `http-relay`. Each enrollment binds:
 
 | Parameter        | Required | Meaning |
 |------------------|----------|---------|
 | `target`         | **yes**  | Route on the API Gateway, relative to the host: a service name, `a/<alias>`, `b/<group>`, `g/<group>`, `e/<code>`. No scheme, no leading slash. |
-| `payload_format` | optional | `email` (default) or `apprise`. |
+| `payload_format` | optional | `x-email-envelope` (default) or `msg`. |
 
 1. **Enroll, one per route**:
 
    ```json
-   { "target": "notify", "payload_format": "apprise" }
+   { "target": "notify", "payload_format": "msg" }
    ```
 
    ```json
-   { "target": "b/mail-archive", "payload_format": "email" }
+   { "target": "b/mail-archive", "payload_format": "x-email-envelope" }
    ```
 
    ```json
@@ -131,6 +133,6 @@ The gateway replays **your own** API key as the bearer token on the hop to the A
 ## Troubleshooting
 
 - **SMTP `550` / route not found** — the `target` doesn't resolve for your account: check spelling, that you are enrolled in the target service, and that an alias/broadcast of that name exists and is enabled.
-- **Route rejects the body (4xx from the target)** — payload-format mismatch: `notify` and `msg-to-*` want `apprise`; faithful consumers want `email`.
+- **Route rejects the body (4xx from the target)** — payload-format mismatch: `notify` and `msg-to-*` want `msg`; faithful consumers want `x-email-envelope`.
 - **All `plus` emails hit the same route** — you used the wrong enrollment code as the SMTP username. Each bridge has its own.
-- **Attachments missing at the destination** — you sent `apprise`; switch the bridge to `email`.
+- **Attachments missing at the destination** — you sent `msg`; switch the bridge to `x-email-envelope`.

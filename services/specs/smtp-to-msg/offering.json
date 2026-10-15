@@ -29,7 +29,7 @@
       "base_url": "${ customer_secrets.SMTP_HTTP_RELAY_BASE_URL }",
       "is_active": true,
       "is_primary": true,
-      "payload_format": "apprise"
+      "payload_format": "msg"
     },
     "plus": {
       "access_method": "http",
@@ -37,7 +37,7 @@
       "base_url": "{{ params.base_url }}",
       "is_active": true,
       "is_primary": true,
-      "payload_format": "apprise"
+      "payload_format": "msg"
     }
   }
 }

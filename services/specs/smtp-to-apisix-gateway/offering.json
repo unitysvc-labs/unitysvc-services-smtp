@@ -29,7 +29,7 @@
       "base_url": "${API_GATEWAY_BASE_URL}/http-to-sink",
       "is_active": true,
       "is_primary": true,
-      "payload_format": "apprise"
+      "payload_format": "msg"
     }
   }
 }

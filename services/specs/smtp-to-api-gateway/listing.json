@@ -63,7 +63,7 @@
   "name": "smtp-to-api-gateway",
   "service_options": {
     "ops_testing_parameters": {
-      "payload_format": "apprise",
+      "payload_format": "msg",
       "target": "http-to-sink"
     }
   },
@@ -88,11 +88,11 @@
   "user_parameters_schema": {
     "properties": {
       "payload_format": {
-        "default": "email",
-        "description": "Body shape POSTed to the target route: `email` (faithful envelope — sender, recipients, subject, text and html bodies, headers, attachments) or `apprise` (compact `{title, body, type, format}` notification envelope, what `notify` and the `msg-to-*` services accept).",
+        "default": "x-email-envelope",
+        "description": "Body shape POSTed to the target route: `x-email-envelope` (faithful envelope — sender, recipients, subject, text and html bodies, headers, attachments) or `msg` (compact `{title, body, type, format}` notification envelope, what `notify` and the `msg-to-*` services accept).",
         "enum": [
-          "email",
-          "apprise"
+          "x-email-envelope",
+          "msg"
         ],
         "type": "string"
       },

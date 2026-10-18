@@ -87,7 +87,7 @@ if __name__ == "__main__":
     os.environ["SMTP_USERNAME"] = "user@gmail.com"
     os.environ["SMTP_PASSWORD"] = "app-password"
 
-    # smtp-byok
+    # smtp-relay (byok channel)
     result = resolve_upstream_test_context({
         "Customer SMTP": {
             "access_method": "smtp",
@@ -98,7 +98,7 @@ if __name__ == "__main__":
             "tls": True,
         }
     })
-    print("=== smtp-byok ===")
+    print("=== smtp-relay (byok) ===")
     for k, v in sorted(result.items()):
         print(f"  {k}={v}")
     # ACCESS_METHOD=smtp, HOST=smtp.gmail.com, PASSWORD=app-password,

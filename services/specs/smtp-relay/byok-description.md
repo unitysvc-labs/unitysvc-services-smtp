@@ -15,7 +15,7 @@ This service exposes two **upstream access channels**. Pick whichever fits — y
 | Best for | one fixed SMTP upstream | many SMTP upstreams under one account |
 | Host / port / user | `SMTP_RELAY_*` customer secrets | `host` / `port` / `username` parameters per enrollment |
 | Password | `SMTP_RELAY_PASSWORD` customer secret | the secret named by the `password_secret` parameter |
-| Reached at | the canonical gateway address (SMTP user `smtp-byok`) | a unique `/e/<code>` address per enrollment (SMTP user = enrollment code) |
+| Reached at | the canonical gateway address (SMTP user `smtp-relay`) | a unique `/e/<code>` address per enrollment (SMTP user = enrollment code) |
 | Price | **free** | **$0.001 / email** ($1 per 1,000) |
 
 In both channels you authenticate to the gateway the same way: the **SMTP password is your svcpass** (`UNITYSVC_API_KEY`). The **SMTP username** is what selects the channel/route.
@@ -30,7 +30,7 @@ One upstream SMTP, configured once via customer secrets.
    - `SMTP_RELAY_PASSWORD` — your SMTP password or app-specific password
    - `SMTP_RELAY_PORT` — *(optional)* SMTP port. Defaults to `587` (STARTTLS); set `465` for SMTPS.
    - `SMTP_RELAY_TLS` — *(optional)* whether to issue STARTTLS. Defaults to `true`; set `false` only for a local sink that doesn't speak TLS (e.g. `mailpit`).
-2. **Send email** to the gateway with SMTP username `smtp-byok` and your svcpass as the password. The gateway resolves your upstream from the stored secrets and relays the message.
+2. **Send email** to the gateway with SMTP username `smtp-relay` and your svcpass as the password. The gateway resolves your upstream from the stored secrets and relays the message.
 
 Common providers (all standard PLAIN/LOGIN SMTP): Gmail `smtp.gmail.com:587` (app password), SendGrid `smtp.sendgrid.net:587`, Mailgun `smtp.mailgun.org:587`, Amazon SES `email-smtp.us-east-1.amazonaws.com:587`, Postmark `smtp.postmarkapp.com:587`.
 

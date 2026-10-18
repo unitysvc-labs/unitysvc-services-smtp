@@ -58,7 +58,7 @@
       "access_method": "smtp",
       "base_url": "${SMTP_GATEWAY_BASE_URL}",
       "routing_key": {
-        "username": "smtp-byok"
+        "username": "smtp-relay"
       }
     }
   },

@@ -28,7 +28,7 @@ sequenceDiagram
 | `payload_format` | Body POSTed to the route | Use it for |
 |---|---|---|
 | `x-email-envelope` | the faithful envelope — `from`, `to`, `subject`, `text_body`, `html_body`, allowlisted `headers`, base64 `attachments`, SPF/DKIM passthrough | routes that need the whole message: `http-to-smtp`, `http-to-smtp-gateway`, archival or parsing services, a `/b/` group whose legs accept `x-email-envelope` |
-| `msg` | the compact `{title, body, type, format}` envelope — subject → `title`, body → `body` | `notify`, any `msg-to-<channel>` service, a `/b/` group of `msg` legs. Attachments, HTML structure and custom headers are dropped. |
+| `msg` | the compact `{title, body, type, format}` envelope — subject → `title`, body → `body` (an HTML-only body becomes markdown), attached files → `attachment` | `notify`, any `msg-to-<channel>` service, a `/b/` group of `msg` legs. Inline parts, HTML beyond bold/italic/code/links, and custom headers are dropped. |
 
 Be lossy as late as possible: if the route (or anything behind it) might need the original message, send `x-email-envelope`.
 

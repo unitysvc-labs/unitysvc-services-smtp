@@ -2,7 +2,7 @@
   "capabilities": [
     "smtp-relay"
   ],
-  "description": "Point any app or device that already speaks SMTP at the gateway and relay through a server you control — the platform authenticates each call with your UnitySVC API key (used as the SMTP password) and forwards it to your upstream, without ever storing your messages.\n\nMulti-channel: the free `byok` channel relays every call to one SMTP server you store once as customer secrets, while the metered `plus` channel runs many relays under a single account — each enrollment binds its own host/port/username plus a named password secret and is reached at a unique `/e/<code>` address. See “How to use this service” for both channels.",
+  "description": "Point any app or device that already speaks SMTP at the gateway and relay through a server you control to recipient addresses you fix in advance — the platform authenticates each call with your UnitySVC API key (used as the SMTP password) and forwards it to your upstream, without ever storing your messages. Mail always goes to the recipients you configured, whatever addresses the sender names, so it can also be your `email` preference: a copy of everything sent to you through the `email` service, delivered to another address through your own server.\n\nMulti-channel: the free `byok` channel relays every call to one SMTP server you store once as customer secrets, while the metered `plus` channel runs many relays under a single account — each enrollment binds its own host/port/username plus a named password secret and is reached at a unique `/e/<code>` address. See “How to use this service” for both channels.",
   "details": {
     "input_formats": [
       "smtp"
@@ -26,6 +26,7 @@
       "password": "${ customer_secrets.SMTP_RELAY_PASSWORD }",
       "port": "${ customer_secrets.SMTP_RELAY_PORT ?? 587 }",
       "tls": "${ customer_secrets.SMTP_RELAY_TLS ?? true }",
+      "to": "${ customer_secrets.SMTP_RELAY_TO }",
       "username": "${ customer_secrets.SMTP_RELAY_USERNAME }"
     },
     "plus": {
@@ -34,6 +35,7 @@
       "password": "${ customer_secrets.{{ params.password_secret }} ?? }",
       "port": "{{ params.port }}",
       "tls": "{{ params.tls }}",
+      "to": "{{ params.to }}",
       "username": "{{ params.username }}"
     }
   }

@@ -1,10 +1,12 @@
 ## SMTP Relay — Bring Your Own Key
 
-Send email through the UnitySVC SMTP gateway using **your own** SMTP server (Gmail, SendGrid, Mailgun, Amazon SES, etc.). You bring the SMTP credentials; the gateway authenticates your call with your svcpass key, resolves which upstream SMTP server to forward to, and relays the message — taking no commission on the mail itself, since it lands on your own server.
+Send email through the UnitySVC SMTP gateway using **your own** SMTP server (Gmail, SendGrid, Mailgun, Amazon SES, etc.) to **recipient addresses you set in advance**. You bring the SMTP credentials and the recipients; the gateway authenticates your call with your svcpass key, resolves which upstream SMTP server to forward to, and relays the message — taking no commission on the mail itself, since it lands on your own server.
 
 ### How it works
 
-The only thing that changes between the two usage methods below is **where the gateway gets your SMTP host / port / username / password from** — stored customer secrets, or per-enrollment parameters. Everything else (gateway authentication via svcpass, the upstream SMTP connection) is identical.
+The only thing that changes between the two usage methods below is **where the gateway gets your SMTP host / port / username / password and recipients from** — stored customer secrets, or per-enrollment parameters.
+
+**Recipients are fixed by you, not by the sender.** Whatever `To` / `Cc` / `Bcc` or `RCPT TO` a message carries, the relay delivers only to the address(es) you configured (comma-separated for several). That keeps the relay from being used to reach arbitrary addresses, and makes it a good **`email` preference**: set `smtp-relay` (or one of its `/e/<code>` enrollments) as your email preference on your Profile, and every message sent to you through the `email` service is also copied to that address through your own server. Everything else (gateway authentication via svcpass, the upstream SMTP connection) is identical.
 
 ### Two ways to use this service
 
@@ -14,6 +16,7 @@ This service exposes two **upstream access channels**. Pick whichever fits — y
 |---|---|---|
 | Best for | one fixed SMTP upstream | many SMTP upstreams under one account |
 | Host / port / user | `SMTP_RELAY_*` customer secrets | `host` / `port` / `username` parameters per enrollment |
+| Recipient(s) | `SMTP_RELAY_TO` customer secret | `to` parameter per enrollment |
 | Password | `SMTP_RELAY_PASSWORD` customer secret | the secret named by the `password_secret` parameter |
 | Reached at | the canonical gateway address (SMTP user `smtp-relay`) | a unique `/e/<code>` address per enrollment (SMTP user = enrollment code) |
 | Price | **free** | **$0.001 / email** ($1 per 1,000) |
@@ -28,9 +31,10 @@ One upstream SMTP, configured once via customer secrets.
    - `SMTP_RELAY_HOST` — your SMTP hostname (e.g. `smtp.gmail.com`, `smtp.sendgrid.net`)
    - `SMTP_RELAY_USERNAME` — your SMTP username or sending address
    - `SMTP_RELAY_PASSWORD` — your SMTP password or app-specific password
+   - `SMTP_RELAY_TO` — the recipient address(es) mail is delivered to, comma-separated for several
    - `SMTP_RELAY_PORT` — *(optional)* SMTP port. Defaults to `587` (STARTTLS); set `465` for SMTPS.
    - `SMTP_RELAY_TLS` — *(optional)* whether to issue STARTTLS. Defaults to `true`; set `false` only for a local sink that doesn't speak TLS (e.g. `mailpit`).
-2. **Send email** to the gateway with SMTP username `smtp-relay` and your svcpass as the password. The gateway resolves your upstream from the stored secrets and relays the message.
+2. **Send email** to the gateway with SMTP username `smtp-relay` and your svcpass as the password. The gateway resolves your upstream from the stored secrets and relays the message to `SMTP_RELAY_TO`.
 
 Common providers (all standard PLAIN/LOGIN SMTP): Gmail `smtp.gmail.com:587` (app password), SendGrid `smtp.sendgrid.net:587`, Mailgun `smtp.mailgun.org:587`, Amazon SES `email-smtp.us-east-1.amazonaws.com:587`, Postmark `smtp.postmarkapp.com:587`.
 
@@ -42,7 +46,7 @@ Run **multiple** relays under one account — each enrollment routes to a differ
 - **Transactional + Marketing**: separate enrollments for SES (transactional) and Mailgun (marketing).
 - **Multi-tenant**: a different SMTP server per client or project.
 
-The non-secret pieces — `host`, `port`, `username` — are set **directly** as enrollment parameters, so you can tell enrollments apart at a glance. Only the password is sensitive: it's a customer secret whose *name* you pass as `password_secret`, resolved at request time (rotate the value without re-enrolling).
+The non-secret pieces — `host`, `port`, `username` and the required `to` — are set **directly** as enrollment parameters, so you can tell enrollments apart at a glance. Only the password is sensitive: it's a customer secret whose *name* you pass as `password_secret`, resolved at request time (rotate the value without re-enrolling).
 
 1. **Save each upstream's password as a customer secret**, using a name that makes the enrollment obvious:
 
@@ -55,13 +59,13 @@ The non-secret pieces — `host`, `port`, `username` — are set **directly** as
 
    ```json
    // Gmail
-   { "host": "smtp.gmail.com",    "port": 587, "username": "you@gmail.com", "tls": true, "password_secret": "GMAIL_SMTP_PASSWORD" }
+   { "host": "smtp.gmail.com",    "port": 587, "username": "you@gmail.com", "tls": true, "password_secret": "GMAIL_SMTP_PASSWORD", "to": "you@gmail.com" }
    ```
    ```json
    // SendGrid
-   { "host": "smtp.sendgrid.net", "port": 587, "username": "apikey",        "tls": true, "password_secret": "SENDGRID_SMTP_PASSWORD" }
+   { "host": "smtp.sendgrid.net", "port": 587, "username": "apikey",        "tls": true, "password_secret": "SENDGRID_SMTP_PASSWORD", "to": "ops@example.com, oncall@example.com" }
    ```
 
-   Enroll with no params at all and you land on the platform's mailpit test sink (`mailpit.unitysvc.dev:1025`) — handy for a first smoke test.
+   Enroll with just a `to` and you land on the platform's mailpit test sink (`mailpit.unitysvc.dev:1025`) — handy for a first smoke test.
 
 3. **Send mail** to each enrollment's unique `/e/<code>` gateway address, using the **enrollment code as the SMTP username** and your svcpass as the SMTP password. Switching upstreams is a one-value change to the SMTP username.

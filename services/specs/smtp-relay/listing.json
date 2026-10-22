@@ -41,6 +41,7 @@
       "password_secret": "SMTP_RELAY_PASSWORD",
       "port": 1025,
       "tls": false,
+      "to": "smtp-relay-test@mailpit.unitysvc.dev",
       "username": ""
     }
   },
@@ -84,13 +85,20 @@
         "description": "Whether to issue STARTTLS on the upstream connection (default: false for the mailpit testing sink). Set true for real SMTP providers (Gmail, SendGrid, SES).",
         "type": "boolean"
       },
+      "to": {
+        "description": "Recipient address(es) this enrollment delivers to, comma-separated for several (e.g. `me@work.example.com`). Mail always goes here, whatever recipients the sender names, so the relay can't be used to reach arbitrary addresses.",
+        "minLength": 3,
+        "type": "string"
+      },
       "username": {
         "default": "",
         "description": "SMTP username (default: empty for mailpit; usually your sending address or an API username).",
         "type": "string"
       }
     },
-    "required": [],
+    "required": [
+      "to"
+    ],
     "type": "object"
   }
 }

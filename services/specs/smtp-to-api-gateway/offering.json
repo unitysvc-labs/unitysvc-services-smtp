@@ -29,7 +29,6 @@
       "auth_mode": "forward",
       "base_url": "${API_GATEWAY_BASE_URL}/${ customer_secrets.SMTP_TO_API_GATEWAY_TARGET ?? notify }",
       "is_active": true,
-      "is_primary": true,
       "payload_format": "${ customer_secrets.SMTP_TO_API_GATEWAY_FORMAT ?? msg }"
     },
     "plus": {
@@ -37,7 +36,6 @@
       "auth_mode": "forward",
       "base_url": "${API_GATEWAY_BASE_URL}/{{ params.target }}",
       "is_active": true,
-      "is_primary": true,
       "payload_format": "{{ params.payload_format }}"
     }
   }

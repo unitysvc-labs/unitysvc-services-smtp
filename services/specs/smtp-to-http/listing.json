@@ -58,12 +58,6 @@
     "type": "channel"
   },
   "name": "smtp-to-http",
-  "service_options": {
-    "ops_testing_parameters": {
-      "api_key_secret": "SMTP_HTTP_RELAY_API_KEY",
-      "base_url": "https://sink.unitysvc.dev"
-    }
-  },
   "status": "ready",
   "time_created": "2026-06-04T00:00:00Z",
   "user_access_interfaces": {
@@ -81,23 +75,5 @@
         "username": "smtp-to-http"
       }
     }
-  },
-  "user_parameters_schema": {
-    "properties": {
-      "api_key_secret": {
-        "default": "",
-        "description": "Name of the customer secret holding the receiver's bearer token. Leave empty if the receiver doesn't need auth.",
-        "type": "string"
-      },
-      "base_url": {
-        "description": "Customer's HTTP receiver URL (e.g. https://hooks.example.com/inbound-mail)",
-        "format": "uri",
-        "type": "string"
-      }
-    },
-    "required": [
-      "base_url"
-    ],
-    "type": "object"
   }
 }

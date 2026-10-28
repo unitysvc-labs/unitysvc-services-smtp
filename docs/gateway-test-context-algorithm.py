@@ -13,7 +13,8 @@ All values are expanded with Jinja2 template rendering and secret resolution.
 
 Inputs:
   - listing.user_access_interfaces: dict[str, dict]
-  - listing.service_options.ops_testing_parameters: dict[str, str]
+  - the tested channel's params.testing_defaults: dict[str, str]
+    (offering.upstream_access_config.<channel>.params.testing_defaults)
   - listing.service_options.enrollment_vars: dict[str, str] (rendered)
   - listing.service_options.routing_vars: dict[str, str]
   - gateway URL placeholders (e.g. ${SMTP_GATEWAY_BASE_URL})
@@ -56,7 +57,7 @@ def resolve_value(val: str, template_ctx: dict) -> str:
 def resolve_gateway_test_contexts(
     user_access_interfaces: dict[str, dict],
     ops_customer_api_key: str,
-    ops_testing_parameters: dict[str, str] | None = None,
+    testing_defaults: dict[str, str] | None = None,
     enrollment_vars: dict[str, str] | None = None,
     routing_vars: dict[str, str] | None = None,
 ) -> list[tuple[str, dict[str, str]]]:
@@ -66,7 +67,7 @@ def resolve_gateway_test_contexts(
     Each interface is tested independently.
     """
     template_ctx = {
-        "params": ops_testing_parameters or {},
+        "params": testing_defaults or {},
         "enrollment_vars": enrollment_vars or {},
         "routing_vars": routing_vars or {},
     }

@@ -35,6 +35,30 @@
       "api_key": "${ customer_secrets.{{ params.api_key_secret }} ?? }",
       "base_url": "{{ params.base_url }}",
       "is_active": true,
+      "params": {
+        "schema": {
+          "properties": {
+            "api_key_secret": {
+              "default": "",
+              "description": "Name of the customer secret holding the receiver's bearer token. Leave empty if the receiver doesn't need auth.",
+              "type": "string"
+            },
+            "base_url": {
+              "description": "Customer's HTTP receiver URL (e.g. https://hooks.example.com/inbound-mail)",
+              "format": "uri",
+              "type": "string"
+            }
+          },
+          "required": [
+            "base_url"
+          ],
+          "type": "object"
+        },
+        "testing_defaults": {
+          "api_key_secret": "SMTP_HTTP_RELAY_API_KEY",
+          "base_url": "https://sink.unitysvc.dev"
+        }
+      },
       "payload_format": "x-email-envelope"
     }
   }

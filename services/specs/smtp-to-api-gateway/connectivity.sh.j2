@@ -6,7 +6,7 @@
 # API to confirm the request made it through both hops
 # (SMTP gateway -> API gateway route -> sink).
 #
-# Under test the target route is http-to-sink (ops_testing_parameters for the
+# Under test the target route is http-to-sink (params.testing_defaults for the
 # plus channel; the SMTP_TO_API_GATEWAY_TARGET seller secret for the default
 # channel), which forwards to the platform sink receiver.
 set -o pipefail

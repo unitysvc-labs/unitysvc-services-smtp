@@ -6,7 +6,7 @@ The test connects directly to the upstream service (no gateway).
 
 Inputs:
   - offering.upstream_access_config: dict[str, dict]
-  - listing.service_options.ops_testing_parameters: dict[str, str]  (Jinja2 params)
+    (each channel's params.testing_defaults supplies its Jinja2 params)
   - listing.service_options.enrollment_vars: dict[str, str]  (rendered enrollment vars)
   - listing.service_options.routing_vars: dict[str, str]  (seller operational vars)
   - os.environ: environment variables (used to resolve secrets)
@@ -41,26 +41,31 @@ def resolve_value(val: str, template_ctx: dict) -> str:
 
 def resolve_upstream_test_context(
     upstream_access_config: dict[str, dict],
-    ops_testing_parameters: dict[str, str] | None = None,
     enrollment_vars: dict[str, str] | None = None,
     routing_vars: dict[str, str] | None = None,
 ) -> dict[str, str]:
     """Build env vars for upstream local test execution."""
     env: dict[str, str] = {}
 
-    # Build template context matching request-time rendering
-    # (see docs/dev-notes/features/jinja2-template-system.md)
-    template_ctx = {
-        "params": ops_testing_parameters or {},
-        "enrollment_vars": enrollment_vars or {},
-        "routing_vars": routing_vars or {},
-    }
-
     for _upstream_name, config in upstream_access_config.items():
         if not isinstance(config, dict):
             continue
 
+        # Build template context matching request-time rendering
+        # (see docs/dev-notes/features/jinja2-template-system.md). Each
+        # channel is tested with its own params.testing_defaults
+        # (unitysvc/unitysvc#2726).
+        channel_params = config.get("params") or {}
+        template_ctx = {
+            "params": channel_params.get("testing_defaults") or {},
+            "enrollment_vars": enrollment_vars or {},
+            "routing_vars": routing_vars or {},
+        }
+
         for key, val in config.items():
+            if key == "params":
+                # The channel's parameter declaration, not a connection field.
+                continue
             if key == "routing_key" and isinstance(val, dict):
                 # Flatten routing_key dict: {"username": "foo"} -> USERNAME=foo
                 for sub_key, sub_val in val.items():
@@ -115,13 +120,16 @@ if __name__ == "__main__":
                 "password": "${ customer_secrets.{{ params.SMTP_PASSWORD_SECRET }} }",
                 "tls": True,
                 "routing_key": {"username": "my-relay"},
+                "params": {
+                    "schema": {"type": "object", "properties": {}},
+                    "testing_defaults": {
+                        "SMTP_HOST_SECRET": "SMTP_HOST",
+                        "SMTP_PORT_SECRET": "SMTP_PORT",
+                        "SMTP_USERNAME_SECRET": "SMTP_USERNAME",
+                        "SMTP_PASSWORD_SECRET": "SMTP_PASSWORD",
+                    },
+                },
             }
-        },
-        ops_testing_parameters={
-            "SMTP_HOST_SECRET": "SMTP_HOST",
-            "SMTP_PORT_SECRET": "SMTP_PORT",
-            "SMTP_USERNAME_SECRET": "SMTP_USERNAME",
-            "SMTP_PASSWORD_SECRET": "SMTP_PASSWORD",
         },
     )
     print("\n=== smtp-relay ===")

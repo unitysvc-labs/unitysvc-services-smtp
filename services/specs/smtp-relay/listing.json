@@ -35,16 +35,6 @@
     "type": "channel"
   },
   "name": "smtp-relay",
-  "service_options": {
-    "ops_testing_parameters": {
-      "host": "mailpit.unitysvc.dev",
-      "password_secret": "SMTP_RELAY_PASSWORD",
-      "port": 1025,
-      "tls": false,
-      "to": "smtp-relay-test@mailpit.unitysvc.dev",
-      "username": ""
-    }
-  },
   "status": "ready",
   "time_created": "2026-03-27T00:00:00Z",
   "user_access_interfaces": {
@@ -62,43 +52,5 @@
         "username": "smtp-relay"
       }
     }
-  },
-  "user_parameters_schema": {
-    "properties": {
-      "host": {
-        "default": "mailpit.unitysvc.dev",
-        "description": "SMTP host (default: mailpit.unitysvc.dev — the platform's mailpit testing sink, accepts any mail without authentication). For production: smtp.gmail.com, smtp.sendgrid.net, email-smtp.us-east-1.amazonaws.com, etc.",
-        "type": "string"
-      },
-      "password_secret": {
-        "default": "SMTP_RELAY_PASSWORD",
-        "description": "Name of the customer secret holding the SMTP password (app-password / API key). Defaults to `SMTP_RELAY_PASSWORD` — the name the free `byok` channel uses — so empty-params enrollments share the seller-seeded testing secret. Override to a per-enrollment name to bind a different key.",
-        "type": "string"
-      },
-      "port": {
-        "default": 1025,
-        "description": "SMTP port (default: 1025 for mailpit; 587 for STARTTLS; 465 for TLS).",
-        "type": "integer"
-      },
-      "tls": {
-        "default": false,
-        "description": "Whether to issue STARTTLS on the upstream connection (default: false for the mailpit testing sink). Set true for real SMTP providers (Gmail, SendGrid, SES).",
-        "type": "boolean"
-      },
-      "to": {
-        "description": "Recipient address(es) this enrollment delivers to, comma-separated for several (e.g. `me@work.example.com`). Mail always goes here, whatever recipients the sender names, so the relay can't be used to reach arbitrary addresses.",
-        "minLength": 3,
-        "type": "string"
-      },
-      "username": {
-        "default": "",
-        "description": "SMTP username (default: empty for mailpit; usually your sending address or an API username).",
-        "type": "string"
-      }
-    },
-    "required": [
-      "to"
-    ],
-    "type": "object"
   }
 }

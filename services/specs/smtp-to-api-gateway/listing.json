@@ -61,12 +61,6 @@
     "type": "channel"
   },
   "name": "smtp-to-api-gateway",
-  "service_options": {
-    "ops_testing_parameters": {
-      "payload_format": "msg",
-      "target": "http-to-sink"
-    }
-  },
   "status": "ready",
   "time_created": "2026-08-20T00:00:00Z",
   "user_access_interfaces": {
@@ -84,27 +78,5 @@
         "username": "smtp-to-api-gateway"
       }
     }
-  },
-  "user_parameters_schema": {
-    "properties": {
-      "payload_format": {
-        "default": "x-email-envelope",
-        "description": "Body shape POSTed to the target route: `x-email-envelope` (faithful envelope — sender, recipients, subject, text and html bodies, headers, attachments) or `msg` (compact `{title, body, type, format}` notification envelope, what `notify` and the `msg-to-*` services accept).",
-        "enum": [
-          "x-email-envelope",
-          "msg"
-        ],
-        "type": "string"
-      },
-      "target": {
-        "description": "Route on the UnitySVC API Gateway to forward to, relative to the gateway host — a service name (`notify`, `msg-to-discord`), an alias (`a/alerts`), a broadcast group (`b/relay`), or an enrollment (`e/XXXXXX`). No scheme, no leading slash.",
-        "pattern": "^[A-Za-z0-9][A-Za-z0-9._@-]*(/[A-Za-z0-9][A-Za-z0-9._@-]*)*$",
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "type": "object"
   }
 }

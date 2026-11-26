@@ -17,7 +17,7 @@ This service exposes two **upstream access channels**. Pick whichever fits — y
 | Best for | one fixed SMTP upstream | many SMTP upstreams under one account |
 | Host / port / user | `SMTP_RELAY_*` customer secrets | `host` / `port` / `username` parameters per enrollment |
 | Recipient(s) | `SMTP_RELAY_TO` customer secret | `to` parameter per enrollment |
-| Password | `SMTP_RELAY_PASSWORD` customer secret | the secret named by the `password_secret` parameter |
+| Password | `SMTP_RELAY_PASSWORD` customer secret | the `password` parameter of the enrollment, kept as a secret |
 | Reached at | the canonical gateway address (SMTP user `smtp-relay`) | a unique `/e/<code>` address per enrollment (SMTP user = enrollment code) |
 | Price | **free** | **$0.001 / email** ($1 per 1,000) |
 
@@ -46,24 +46,17 @@ Run **multiple** relays under one account — each enrollment routes to a differ
 - **Transactional + Marketing**: separate enrollments for SES (transactional) and Mailgun (marketing).
 - **Multi-tenant**: a different SMTP server per client or project.
 
-The non-secret pieces — `host`, `port`, `username` and the required `to` — are set **directly** as enrollment parameters, so you can tell enrollments apart at a glance. Only the password is sensitive: it's a customer secret whose *name* you pass as `password_secret`, resolved at request time (rotate the value without re-enrolling).
+The non-secret pieces — `host`, `port`, `username` and the required `to` — are set **directly** as enrollment parameters, so you can tell enrollments apart at a glance. Only the password is sensitive: paste it as the `password` parameter and the platform keeps it as a secret (it is not shown again). To rotate one password used by several enrollments in one place, create a customer secret and pick it for `password` in each.
 
-1. **Save each upstream's password as a customer secret**, using a name that makes the enrollment obvious:
-
-   ```bash
-   usvc_seller secrets set GMAIL_SMTP_PASSWORD    --value "<gmail-app-password>"
-   usvc_seller secrets set SENDGRID_SMTP_PASSWORD --value "<sendgrid-api-key>"
-   ```
-
-2. **Enroll once per upstream**, supplying `host` / `port` / `username` inline and `password_secret` as the name from step 1:
+1. **Enroll once per upstream**, supplying `host` / `port` / `username` and the `password`:
 
    ```json
    // Gmail
-   { "host": "smtp.gmail.com",    "port": 587, "username": "you@gmail.com", "tls": true, "password_secret": "GMAIL_SMTP_PASSWORD", "to": "you@gmail.com" }
+   { "host": "smtp.gmail.com",    "port": 587, "username": "you@gmail.com", "tls": true, "password": "<gmail-app-password>", "to": "you@gmail.com" }
    ```
    ```json
    // SendGrid
-   { "host": "smtp.sendgrid.net", "port": 587, "username": "apikey",        "tls": true, "password_secret": "SENDGRID_SMTP_PASSWORD", "to": "ops@example.com, oncall@example.com" }
+   { "host": "smtp.sendgrid.net", "port": 587, "username": "apikey",        "tls": true, "password": "<sendgrid-api-key>", "to": "ops@example.com, oncall@example.com" }
    ```
 
    Enroll with just a `to` and you land on the platform's mailpit test sink (`mailpit.unitysvc.dev:1025`) — handy for a first smoke test.

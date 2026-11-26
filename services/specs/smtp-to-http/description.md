@@ -31,7 +31,7 @@ This service exposes two **upstream access channels**. Pick whichever fits — y
 | --------------- | ----------------------------------------------- | ------------------------------------------------------------- |
 | Best for        | one fixed receiver                              | many email-to-webhook routes under one account                |
 | Destination URL | `SMTP_HTTP_RELAY_BASE_URL` customer secret      | a `base_url` parameter per enrollment                         |
-| Bearer token    | `SMTP_HTTP_RELAY_API_KEY` customer secret (optional) | the secret named by the `api_key_secret` parameter (optional) |
+| Bearer token    | `SMTP_HTTP_RELAY_API_KEY` customer secret (optional) | the `api_key` parameter of the enrollment, kept as a secret (optional) |
 | SMTP username   | `smtp-to-http`                                  | the enrollment's 6-character code                             |
 | Reached at      | the canonical gateway address                   | a unique `/e/<code>` address per enrollment                   |
 | Price           | **free**                                        | **$0.001 / email** ($1 per 1,000)                             |
@@ -84,30 +84,23 @@ Run **multiple** email-to-webhook routes under one account — e.g. `sales@…` 
 | Parameter        | Required | Meaning                                                                                                                                           |
 | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `base_url`       | **yes**  | HTTP receiver URL for this enrollment, e.g. `https://hooks.example.com/sales-inbound`. A literal, not a secret.                                   |
-| `api_key_secret` | optional | Name of a customer secret holding this receiver's bearer token, forwarded as `Authorization: Bearer <secret>`. Empty when the receiver is public. |
+| `api_key`        | optional | This receiver's bearer token, forwarded as `Authorization: Bearer <token>`. Paste it or pick one of your secrets; it is kept as a secret. Empty when the receiver is public. |
 
-The `base_url` is fixed per enrollment; re-enroll (or update) to move it. The `api_key_secret` value is resolved at request time, so rotating a token is a `usvc_seller secrets set` away — no re-enroll.
+The `base_url` is fixed per enrollment; re-enroll (or update) to move it. To rotate a token, paste the new one in the enrollment; a token shared by several enrollments can be a customer secret you pick for each, rotated in one place.
 
-1. **(Optional) Save each receiver's bearer token** as a customer secret — one per route:
-
-   ```bash
-   usvc_seller secrets set CRM_API_KEY      --value "<crm-bearer>"
-   usvc_seller secrets set HELPDESK_API_KEY --value "<helpdesk-bearer>"
-   ```
-
-2. **Enroll, one per route**, supplying the destination inline:
+1. **Enroll, one per route**, supplying the destination and its token:
 
    ```json
    {
      "base_url": "https://crm.example.com/inbound-mail",
-     "api_key_secret": "CRM_API_KEY"
+     "api_key": "<crm-bearer>"
    }
    ```
 
    ```json
    {
      "base_url": "https://helpdesk.example.com/email-ingest",
-     "api_key_secret": "HELPDESK_API_KEY"
+     "api_key": "<helpdesk-bearer>"
    }
    ```
 
@@ -128,6 +121,6 @@ The `base_url` is fixed per enrollment; re-enroll (or update) to move it. The `a
 ## Troubleshooting
 
 - **No POST arrives** — confirm the destination is set (`SMTP_HTTP_RELAY_BASE_URL` for `byok`, or the enrollment's `base_url` for `plus`); confirm the receiver is publicly reachable; confirm the SMTP login succeeded (a clean `250` only follows a valid svcpass auth).
-- **POST arrives, receiver 401s** — bearer-token mismatch; check `SMTP_HTTP_RELAY_API_KEY` (byok) or the enrollment's `api_key_secret` value, and that the receiver expects `Authorization: Bearer`.
+- **POST arrives, receiver 401s** — bearer-token mismatch; check `SMTP_HTTP_RELAY_API_KEY` (byok) or the enrollment's `api_key`, and that the receiver expects `Authorization: Bearer`.
 - **All `plus` emails hit the same receiver** — you used the wrong enrollment code as the SMTP username. Each route has its own.
 - **Attachments missing** — they're in `attachments[].content` as base64; some clients show only `text_body`/`html_body`.

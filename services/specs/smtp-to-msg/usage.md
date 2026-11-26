@@ -22,7 +22,7 @@ Authenticate with your svcpass as the SMTP password, then pick a channel — you
 
 |               | `byok` — stored receiver (free)                                            | `plus` — per-enrollment receivers ($0.001/email)          |
 | ------------- | -------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Destination   | `SMTP_HTTP_RELAY_BASE_URL` secret (+ optional `SMTP_HTTP_RELAY_API_KEY` bearer) | a `base_url` per enrollment (+ optional `api_key_secret`) |
+| Destination   | `SMTP_HTTP_RELAY_BASE_URL` secret (+ optional `SMTP_HTTP_RELAY_API_KEY` bearer) | a `base_url` per enrollment (+ optional `api_key`) |
 | SMTP username | `smtp-to-msg`                                                              | the enrollment's 6-character code                         |
 | Reached at    | the canonical gateway address                                              | a unique `/e/<code>` address                              |
 
@@ -32,4 +32,4 @@ See the attached **shell** and **python** code examples for how to send. Any end
 
 - **No notification arrives** — confirm your receiver accepts a `POST` of the `msg` envelope (`{title, body, type, format}`, plus `attachment` when present) at that URL.
 - **`plus`: all mail hits one receiver** — wrong enrollment code as the SMTP username; each route has its own.
-- **One route 401s, others work** — that enrollment's `api_key_secret` doesn't match the receiver, or is stale. Re-set it.
+- **One route 401s, others work** — that enrollment's `api_key` doesn't match the receiver, or is stale. Paste the new one in the enrollment.

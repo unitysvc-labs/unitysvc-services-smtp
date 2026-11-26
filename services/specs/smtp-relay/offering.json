@@ -75,7 +75,7 @@
         },
         "testing_defaults": {
           "host": "mailpit.unitysvc.dev",
-          "password": "${ customer_secrets.SMTP_RELAY_PASSWORD }",
+          "password": "${ customer_secrets.SMTP_RELAY_PASSWORD ?? }",
           "port": 1025,
           "tls": false,
           "to": "smtp-relay-test@mailpit.unitysvc.dev",

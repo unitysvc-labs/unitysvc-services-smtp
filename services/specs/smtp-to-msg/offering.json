@@ -57,7 +57,7 @@
           "type": "object"
         },
         "testing_defaults": {
-          "api_key": "${ customer_secrets.SMTP_HTTP_RELAY_API_KEY }",
+          "api_key": "${ customer_secrets.SMTP_HTTP_RELAY_API_KEY ?? }",
           "base_url": "https://sink.unitysvc.dev"
         }
       },

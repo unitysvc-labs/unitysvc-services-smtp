@@ -21,7 +21,9 @@ status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "${SINK}" \
 {% else %}
 # Gateway send: submit the email over SMTP; the gateway forwards the full
 # envelope (subject, text_body, headers, ...) as JSON to the receiver.
-curl --silent --show-error --ssl --url "{{ service_base_url }}" \
+# --crlf sends the heredoc's lines CRLF-terminated; the gateway rejects a
+# message with bare line feeds (451 Bare line-feed).
+curl --silent --show-error --ssl --crlf --url "{{ service_base_url }}" \
   --user "{{ routing_key.username }}:${UNITYSVC_API_KEY:?set UNITYSVC_API_KEY to your svcpass}" \
   --mail-from "test@example.com" --mail-rcpt "recipient@example.com" \
   --upload-file - <<EMAIL
